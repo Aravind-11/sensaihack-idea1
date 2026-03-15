@@ -62,10 +62,10 @@
     {
         "tick": 2,
         "agent_id": "car-alpha",
-        "type": "OBSERVE",
+        "type": "THINK",
         "payload": {
-            "thought": "Cruising, lane clear.",
-            "intent": "Cruise",
+            "thought": "Intersection not clear",
+            "intent": "Monitor",
             "position": [
                 1.0,
                 0.4,
@@ -79,7 +79,7 @@
         "agent_id": "car-beta",
         "type": "THINK",
         "payload": {
-            "thought": "Approaching crossing zone.",
+            "thought": "pproaching intersection.",
             "intent": "Monitor",
             "position": [
                 10.0,
@@ -122,10 +122,10 @@
     {
         "tick": 3,
         "agent_id": "car-alpha",
-        "type": "THINK",
+        "type": "ACTION",
         "payload": {
-            "thought": "Approaching intersection.",
-            "intent": "Monitor",
+            "thought": "Slowing Down for intersection",
+            "intent": "Yield",
             "position": [
                 1.0,
                 0.4,
@@ -182,10 +182,10 @@
     {
         "tick": 4,
         "agent_id": "car-alpha",
-        "type": "OBSERVE",
+        "type": "ACTION",
         "payload": {
-            "thought": "Path clear ahead.",
-            "intent": "Cruise",
+            "thought": "Slowing Down for intersection",
+            "intent": "Yield",
             "position": [
                 1.0,
                 0.4,
@@ -242,10 +242,10 @@
     {
         "tick": 5,
         "agent_id": "car-alpha",
-        "type": "OBSERVE",
+        "type": "ACTION",
         "payload": {
-            "thought": "Continuing to destination.",
-            "intent": "Cruise",
+            "thought": "Stopped and waiting for intersection to clear",
+            "intent": "Yield",
             "position": [
                 1.0,
                 0.4,
@@ -304,8 +304,8 @@
         "agent_id": "car-alpha",
         "type": "OBSERVE",
         "payload": {
-            "thought": "Nearly there.",
-            "intent": "Cruise",
+            "thought": "Waiting for intersection to clear",
+            "intent": "Wait",
             "position": [
                 1.0,
                 0.4,
@@ -364,8 +364,8 @@
         "agent_id": "car-alpha",
         "type": "OBSERVE",
         "payload": {
-            "thought": "Final approach.",
-            "intent": "Cruise",
+            "thought": "Waiting for intersection to clear",
+            "intent": "Wait",
             "position": [
                 1.0,
                 0.4,
@@ -422,10 +422,10 @@
     {
         "tick": 8,
         "agent_id": "car-alpha",
-        "type": "ACTION",
+        "type": "OBSERVE",
         "payload": {
-            "thought": "Destination reached.",
-            "intent": "Stop",
+            "thought": "Waiting for intersection to clear",
+            "intent": "Wait",
             "position": [
                 1.0,
                 0.4,
@@ -484,8 +484,8 @@
         "agent_id": "car-alpha",
         "type": "ACTION",
         "payload": {
-            "thought": "New step added.",
-            "intent": "Stop",
+            "thought": "Performing Right Hand Turn in intersection",
+            "intent": "Turn",
             "position": [
                 1.0,
                 0.4,
