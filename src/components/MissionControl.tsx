@@ -9,7 +9,11 @@ type MissionControlHUDProps = {
   logs: AuditEvent[]
   currentTick: number
   maxTick: number
+  isXRPresenting: boolean
   onTickChange: (tick: number) => void
+  isReplayPlaying: boolean
+  onReplayToggle: () => void
+  onReplayReset: () => void
   onVerifyIntegrity: () => Promise<boolean>
   onEnterVR: () => Promise<void> | void
   onFocusAgent: (agentId: string | null) => void
@@ -77,7 +81,11 @@ export function MissionControlHUD({
   logs,
   currentTick,
   maxTick,
+  isXRPresenting,
   onTickChange,
+  isReplayPlaying,
+  onReplayToggle,
+  onReplayReset,
   onVerifyIntegrity,
   onEnterVR,
   onFocusAgent,
@@ -127,6 +135,9 @@ export function MissionControlHUD({
   useEffect(() => {
     onFocusAgent(selectedLog?.agent_id ?? null)
   }, [selectedLog, onFocusAgent])
+  useEffect(() => {
+    if (isXRPresenting) setDockMode('dock')
+  }, [isXRPresenting])
 
   const wrapperStyle: React.CSSProperties =
     dockMode === 'follow'
@@ -139,10 +150,10 @@ export function MissionControlHUD({
         }
       : {
           position: 'fixed',
-          right: 12,
-          top: 12,
+          right: isXRPresenting ? 6 : 12,
+          top: isXRPresenting ? 6 : 12,
           zIndex: 10,
-          transform: 'translateZ(80px)',
+          transform: isXRPresenting ? 'translateZ(45px)' : 'translateZ(80px)',
         }
 
   const handleVerifyClick = async () => {
@@ -155,7 +166,15 @@ export function MissionControlHUD({
 
   return (
     <SpatialDiv component="div" style={wrapperStyle}>
-      <div style={{ ...basePanelStyle, borderColor: getBorderColor(verifyState) }}>
+      <div
+        style={{
+          ...basePanelStyle,
+          width: isXRPresenting ? 286 : basePanelStyle.width,
+          maxHeight: isXRPresenting ? '70vh' : basePanelStyle.maxHeight,
+          padding: isXRPresenting ? 10 : basePanelStyle.padding,
+          borderColor: getBorderColor(verifyState),
+        }}
+      >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
           <h3 style={{ margin: 0, fontSize: 24, letterSpacing: 0.3, color: '#2dd4ff', textShadow: '0 0 12px rgba(45, 212, 255, 0.25)' }}>
             Mission Control HUD
@@ -205,6 +224,14 @@ export function MissionControlHUD({
           onChange={(event) => onTickChange(Number(event.target.value))}
           style={{ width: '100%', marginBottom: 12, accentColor: '#21d4fd' }}
         />
+        <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+          <button style={hudButtonStyle} onClick={onReplayToggle}>
+            {isReplayPlaying ? 'Pause Replay' : 'Play Replay'}
+          </button>
+          <button style={hudButtonStyle} onClick={onReplayReset}>
+            Reset Replay
+          </button>
+        </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
           <label style={{ fontSize: 12, color: '#7ec8ff' }}>Scenario</label>

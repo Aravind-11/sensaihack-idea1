@@ -1,14 +1,14 @@
 import { Canvas, useFrame } from '@react-three/fiber'
 import { ContactShadows, Environment, Grid, Line, OrbitControls, Sky, Text } from '@react-three/drei'
 import { XR, XROrigin, createXRStore } from '@react-three/xr'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 import { buildDemoLogChain, type ScenarioId, verifyLogChain } from './audit/clientLog'
 import { buildAgentStateAtTick, getInteractionsAtTick, getMaxTick } from './audit/replay'
 import { MissionControlHUD } from './components/MissionControl'
 import { SpatialAgent } from './components/SpatialAgent'
 import type { AgentInteraction, AuditEvent, Vec3Tuple } from './types/audit'
-import type { Group } from 'three'
+import { Vector3, type Group } from 'three'
 
 const xrStore = createXRStore({
   emulate: false,
@@ -184,9 +184,35 @@ function LampPost({ position }: { position: Vec3Tuple }) {
   )
 }
 
-function PlayerRig() {
+const forwardVector = new Vector3()
+const rightVector = new Vector3()
+const movementDelta = new Vector3()
+const KEYBOARD_DEADZONE = 0.01
+const CONTROLLER_DEADZONE = 0.18
+const TURN_INPUT_DEADZONE = 0.65
+const SNAP_TURN_RADIANS = Math.PI / 8
+
+type PlayerRigProps = {
+  onStepTick: (delta: number) => void
+  onXRPresentingChange: (presenting: boolean) => void
+}
+
+const getStickAxes = (gamepad: Gamepad): { x: number; y: number } => {
+  const primaryX = gamepad.axes[0] ?? 0
+  const primaryY = gamepad.axes[1] ?? 0
+  const altX = gamepad.axes[2] ?? 0
+  const altY = gamepad.axes[3] ?? 0
+  const primaryMagnitude = primaryX * primaryX + primaryY * primaryY
+  const altMagnitude = altX * altX + altY * altY
+  return altMagnitude > primaryMagnitude ? { x: altX, y: altY } : { x: primaryX, y: primaryY }
+}
+
+function PlayerRig({ onStepTick, onXRPresentingChange }: PlayerRigProps) {
   const originRef = useRef<Group>(null)
   const keysRef = useRef<Record<string, boolean>>({})
+  const triggerLatchRef = useRef<Record<'left' | 'right', boolean>>({ left: false, right: false })
+  const turnLatchRef = useRef(false)
+  const xrPresentingRef = useRef(false)
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -203,16 +229,72 @@ function PlayerRig() {
     }
   }, [])
 
-  useFrame((_state, delta) => {
+  useFrame((state, delta) => {
     if (!originRef.current) return
+    const presenting = state.gl.xr.isPresenting
+    if (xrPresentingRef.current !== presenting) {
+      xrPresentingRef.current = presenting
+      onXRPresentingChange(presenting)
+    }
     const keys = keysRef.current
     const baseSpeed = keys.shift ? 5.2 : 2.8
     const step = baseSpeed * delta
+    let moveX = 0
+    let moveZ = 0
+    let turnAxisX = 0
 
-    if (keys.w || keys.arrowup) originRef.current.position.z -= step
-    if (keys.s || keys.arrowdown) originRef.current.position.z += step
-    if (keys.a || keys.arrowleft) originRef.current.position.x -= step
-    if (keys.d || keys.arrowright) originRef.current.position.x += step
+    if (keys.w || keys.arrowup) moveZ -= 1
+    if (keys.s || keys.arrowdown) moveZ += 1
+    if (keys.a || keys.arrowleft) moveX -= 1
+    if (keys.d || keys.arrowright) moveX += 1
+    if (keys.q) turnAxisX = -1
+    if (keys.e) turnAxisX = 1
+
+    const xrSession = state.gl.xr.getSession()
+    if (xrSession) {
+      for (const source of xrSession.inputSources) {
+        if (source.handedness !== 'left' && source.handedness !== 'right') continue
+        const gamepad = source.gamepad
+        if (!gamepad) continue
+        const { x: axisX, y: axisY } = getStickAxes(gamepad)
+
+        // Keep locomotion bound to left stick and turning bound to right stick.
+        if (source.handedness === 'left') {
+          if (Math.abs(axisX) > CONTROLLER_DEADZONE) moveX += axisX
+          if (Math.abs(axisY) > CONTROLLER_DEADZONE) moveZ += axisY
+        } else if (source.handedness === 'right') {
+          if (Math.abs(axisX) > CONTROLLER_DEADZONE) turnAxisX = axisX
+        }
+
+        const triggerPressed = Boolean(gamepad.buttons[0]?.pressed)
+        const hand = source.handedness
+        if (triggerPressed && !triggerLatchRef.current[hand]) {
+          onStepTick(hand === 'right' ? 1 : -1)
+        }
+        triggerLatchRef.current[hand] = triggerPressed
+      }
+    }
+
+    if (Math.abs(turnAxisX) > TURN_INPUT_DEADZONE) {
+      if (!turnLatchRef.current) {
+        originRef.current.rotation.y += turnAxisX > 0 ? -SNAP_TURN_RADIANS : SNAP_TURN_RADIANS
+        turnLatchRef.current = true
+      }
+    } else {
+      turnLatchRef.current = false
+    }
+
+    if (Math.abs(moveX) <= KEYBOARD_DEADZONE && Math.abs(moveZ) <= KEYBOARD_DEADZONE) return
+    forwardVector.set(0, 0, -1).applyQuaternion(state.camera.quaternion)
+    rightVector.set(1, 0, 0).applyQuaternion(state.camera.quaternion)
+    forwardVector.y = 0
+    rightVector.y = 0
+    if (forwardVector.lengthSq() > 0) forwardVector.normalize()
+    if (rightVector.lengthSq() > 0) rightVector.normalize()
+    movementDelta.set(0, 0, 0)
+    movementDelta.addScaledVector(forwardVector, -moveZ * step)
+    movementDelta.addScaledVector(rightVector, moveX * step)
+    originRef.current.position.add(movementDelta)
   })
 
   return <XROrigin ref={originRef} position={[0, 0, 0]} />
@@ -428,6 +510,8 @@ function WorldGeometry({ scenario }: { scenario: ScenarioId }) {
 function App() {
   const [logs, setLogs] = useState<AuditEvent[]>([])
   const [currentTick, setCurrentTick] = useState(0)
+  const [isReplayPlaying, setIsReplayPlaying] = useState(false)
+  const [isXRPresenting, setIsXRPresenting] = useState(false)
   const [focusedAgentId, setFocusedAgentId] = useState<string | null>(null)
   const [scenario, setScenario] = useState<ScenarioId>('city-merge')
   const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('medium')
@@ -440,12 +524,17 @@ function App() {
       if (!active) return
       setLogs(chain)
       setCurrentTick(getMaxTick(chain))
+      setIsReplayPlaying(false)
       setFocusedAgentId(null)
     })
     return () => {
       active = false
     }
   }, [scenario])
+  useEffect(() => {
+    if (!isXRPresenting) return
+    setIsReplayPlaying(false)
+  }, [isXRPresenting])
 
   const maxTick = useMemo(() => getMaxTick(logs), [logs])
   const agentStates = useMemo(() => buildAgentStateAtTick(logs, currentTick), [logs, currentTick])
@@ -465,6 +554,38 @@ function App() {
     [agentStates, visibleAgentIds],
   )
   const interactions = useMemo<AgentInteraction[]>(() => getInteractionsAtTick(logs, currentTick), [logs, currentTick])
+  const handleTickChange = useCallback((tick: number) => {
+    setCurrentTick(tick)
+    setIsReplayPlaying(false)
+  }, [])
+  const handleReplayToggle = useCallback(() => {
+    setIsReplayPlaying((playing) => !playing)
+  }, [])
+  const handleReplayReset = useCallback(() => {
+    setCurrentTick(0)
+    setIsReplayPlaying(false)
+  }, [])
+  const handleStepTick = useCallback(
+    (delta: number) => {
+      setCurrentTick((tick) => Math.max(0, Math.min(maxTick, tick + delta)))
+      setIsReplayPlaying(false)
+    },
+    [maxTick],
+  )
+  useEffect(() => {
+    if (!isReplayPlaying) return
+    const timer = window.setInterval(() => {
+      setCurrentTick((tick) => {
+        if (tick >= maxTick) {
+          window.clearInterval(timer)
+          setIsReplayPlaying(false)
+          return maxTick
+        }
+        return tick + 1
+      })
+    }, 650)
+    return () => window.clearInterval(timer)
+  }, [isReplayPlaying, maxTick])
   const agentTrails = useMemo(() => {
     const trails: Record<string, Vec3Tuple[]> = {}
     for (const event of visibleLogs) {
@@ -574,14 +695,17 @@ function App() {
       showEnvironment: false,
     }
   }, [performanceMode])
-
   return (
     <>
       <MissionControlHUD
         logs={visibleLogs}
         currentTick={currentTick}
         maxTick={maxTick}
-        onTickChange={setCurrentTick}
+        isXRPresenting={isXRPresenting}
+        onTickChange={handleTickChange}
+        isReplayPlaying={isReplayPlaying}
+        onReplayToggle={handleReplayToggle}
+        onReplayReset={handleReplayReset}
         onVerifyIntegrity={verifyIntegrity}
         onEnterVR={handleEnterVR}
         onFocusAgent={setFocusedAgentId}
@@ -602,7 +726,7 @@ function App() {
         camera={{ position: [7.8, 7.2, 8.6], fov: 45 }}
       >
         <XR store={xrStore}>
-          <PlayerRig />
+          <PlayerRig onStepTick={handleStepTick} onXRPresentingChange={setIsXRPresenting} />
           <color attach="background" args={[worldConfig.sky]} />
           <fog attach="fog" args={[worldConfig.sky, 20, 55]} />
           {perf.showSky && (
