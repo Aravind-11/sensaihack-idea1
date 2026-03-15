@@ -18,7 +18,7 @@ from collections import defaultdict
 
 # ── Paths ────────────────────────────────────────────────────────────────────
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-JSON_PATH  = os.path.join(SCRIPT_DIR, "cityMergeDrafts.json")
+JSON_PATH  = os.path.join(SCRIPT_DIR, "highwayDrafts.json")
 
 # ── Car colours (match test.py) ───────────────────────────────────────────────
 CAR_COLORS = {
@@ -75,8 +75,10 @@ fig, ax = plt.subplots(figsize=(9, 9))
 plt.subplots_adjust(bottom=0.12)
 
 ax.set_aspect("equal")
-ax.set_xlim(-16, 16)
-ax.set_ylim(-16, 16)
+# ax.set_xlim(-16, 16)
+# ax.set_ylim(-16, 16)
+ax.set_xlim(-24, 24)
+ax.set_ylim(-24, 24)
 ax.set_xlabel("X", fontsize=11)
 ax.set_ylabel("Y", fontsize=11)
 ax.set_title("Path Editor (+Z is Down) – drag dots • Save writes to JSON", fontsize=11)
