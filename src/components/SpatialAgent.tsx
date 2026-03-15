@@ -11,6 +11,7 @@ type SpatialAgentProps = {
   intent?: string
   speedMps?: number
   seeing?: string[]
+  direction?: Vec3Tuple
   color?: string
   focused?: boolean
   renderBody?: boolean
@@ -22,11 +23,13 @@ export function SpatialAgent({
   id,
   position,
   thought,
+  direction = [1, 0, 0],
   color = '#7dd3fc',
   focused = false,
   renderBody = true,
 }: SpatialAgentProps) {
   const groupRef = useRef<Group>(null)
+  const directionYaw = Math.atan2(-direction[2], direction[0])
 
   useFrame((_state, delta) => {
     if (!groupRef.current) return
@@ -82,6 +85,16 @@ export function SpatialAgent({
               side={2}
             />
           </mesh>
+          <group position={[0, 0.19, 0]} rotation={[0, directionYaw, 0]}>
+            <mesh position={[0.23, 0, 0]}>
+              <cylinderGeometry args={[0.024, 0.024, 0.24, 8]} />
+              <meshStandardMaterial color="#fef08a" emissive="#fde047" emissiveIntensity={0.55} />
+            </mesh>
+            <mesh position={[0.41, 0, 0]}>
+              <coneGeometry args={[0.07, 0.13, 12]} />
+              <meshStandardMaterial color="#fef08a" emissive="#fde047" emissiveIntensity={0.6} />
+            </mesh>
+          </group>
         </>
       )}
 

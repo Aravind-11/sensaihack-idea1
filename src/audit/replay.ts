@@ -4,11 +4,40 @@ const DEFAULT_POSITION: Vec3Tuple = [0, 0.4, 0]
 const DEFAULT_THOUGHT = 'Awaiting mission tick...'
 const DEFAULT_INTENT = 'Hold lane'
 
+type ReplayCache = {
+  sorted: AuditEvent[]
+  byTick: Map<number, AuditEvent[]>
+  maxTick: number
+}
+
+const replayCacheByRef = new WeakMap<AuditEvent[], ReplayCache>()
+
+const buildReplayCache = (logs: AuditEvent[]): ReplayCache => {
+  const sorted = [...logs].sort((a, b) => a.tick - b.tick)
+  const byTick = new Map<number, AuditEvent[]>()
+  let maxTick = 0
+  for (const event of sorted) {
+    maxTick = Math.max(maxTick, event.tick)
+    const bucket = byTick.get(event.tick)
+    if (bucket) bucket.push(event)
+    else byTick.set(event.tick, [event])
+  }
+  return { sorted, byTick, maxTick }
+}
+
+const getReplayCache = (logs: AuditEvent[]): ReplayCache => {
+  const cached = replayCacheByRef.get(logs)
+  if (cached) return cached
+  const next = buildReplayCache(logs)
+  replayCacheByRef.set(logs, next)
+  return next
+}
+
 export const buildAgentStateAtTick = (
   logs: AuditEvent[],
   tick: number,
 ): Record<string, AgentVisualState> => {
-  const sorted = [...logs].sort((a, b) => a.tick - b.tick)
+  const { sorted } = getReplayCache(logs)
   const state: Record<string, AgentVisualState> = {}
 
   for (const event of sorted) {
@@ -50,16 +79,15 @@ export const buildAgentStateAtTick = (
 }
 
 export const getMaxTick = (logs: AuditEvent[]): number =>
-  logs.reduce((max, event) => Math.max(max, event.tick), 0)
+  getReplayCache(logs).maxTick
 
 export const getInteractionsAtTick = (
   logs: AuditEvent[],
   tick: number,
 ): AgentInteraction[] =>
-  logs
+  (getReplayCache(logs).byTick.get(tick) ?? [])
     .filter(
       (event) =>
-        event.tick === tick &&
         typeof event.payload.target_agent === 'string' &&
         typeof event.payload.interaction === 'string',
     )
