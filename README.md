@@ -2,7 +2,9 @@
 
 A WebXR 3D dashboard that visualizes autonomous vehicle decision-making in real time. Watch AI-driven cars navigate city intersections and highways, see their "thought bubbles", and verify tamper-evident audit logs -- all in VR or on desktop.
 
-![SensAI Mission Control XR](illustration.gif)
+<p align="center">
+  <img src="illustration.gif" alt="SensAI Mission Control XR" width="600">
+</p>
 
 ---
 
