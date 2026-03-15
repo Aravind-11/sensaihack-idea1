@@ -1,0 +1,103 @@
+import { Billboard, Text } from '@react-three/drei'
+import { useFrame } from '@react-three/fiber'
+import { useRef } from 'react'
+import { Group, Vector3 } from 'three'
+import type { Vec3Tuple } from '../types/audit'
+
+type SpatialAgentProps = {
+  id: string
+  position: Vec3Tuple
+  thought: string
+  intent?: string
+  speedMps?: number
+  seeing?: string[]
+  color?: string
+  focused?: boolean
+  renderBody?: boolean
+}
+
+const tempVector = new Vector3()
+
+export function SpatialAgent({
+  id,
+  position,
+  thought,
+  color = '#7dd3fc',
+  focused = false,
+  renderBody = true,
+}: SpatialAgentProps) {
+  const groupRef = useRef<Group>(null)
+
+  useFrame((_state, delta) => {
+    if (!groupRef.current) return
+    tempVector.set(position[0], position[1], position[2])
+    groupRef.current.position.lerp(tempVector, Math.min(1, delta * 3))
+  })
+
+  return (
+    <group ref={groupRef}>
+      {renderBody && (
+        <>
+          <mesh castShadow receiveShadow>
+            <boxGeometry args={[0.75, 0.28, 0.45]} />
+            <meshStandardMaterial
+              color={color}
+              emissive={color}
+              emissiveIntensity={focused ? 0.45 : 0.2}
+              roughness={0.35}
+            />
+          </mesh>
+
+          <mesh position={[0, -0.25, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.4, focused ? 0.52 : 0.48, 40]} />
+            <meshBasicMaterial color={color} transparent opacity={focused ? 0.85 : 0.5} />
+          </mesh>
+
+          <mesh position={[-0.24, -0.12, 0.2]} rotation={[0, 0, Math.PI / 2]}>
+            <cylinderGeometry args={[0.08, 0.08, 0.08, 16]} />
+            <meshStandardMaterial color="#0b1120" />
+          </mesh>
+          <mesh position={[0.24, -0.12, 0.2]} rotation={[0, 0, Math.PI / 2]}>
+            <cylinderGeometry args={[0.08, 0.08, 0.08, 16]} />
+            <meshStandardMaterial color="#0b1120" />
+          </mesh>
+
+          <mesh position={[-0.24, -0.12, -0.2]} rotation={[0, 0, Math.PI / 2]}>
+            <cylinderGeometry args={[0.08, 0.08, 0.08, 16]} />
+            <meshStandardMaterial color="#0b1120" />
+          </mesh>
+          <mesh position={[0.24, -0.12, -0.2]} rotation={[0, 0, Math.PI / 2]}>
+            <cylinderGeometry args={[0.08, 0.08, 0.08, 16]} />
+            <meshStandardMaterial color="#0b1120" />
+          </mesh>
+
+          <mesh position={[0.2, 0.03, 0]} rotation={[Math.PI / 2, 0, -Math.PI / 2]}>
+            <coneGeometry args={[0.5, 1.4, 24, 1, true]} />
+            <meshStandardMaterial
+              color="#67e8f9"
+              emissive="#67e8f9"
+              emissiveIntensity={0.3}
+              transparent
+              opacity={0.18}
+              side={2}
+            />
+          </mesh>
+        </>
+      )}
+
+      <Billboard position={[0, renderBody ? 0.96 : 0.4, 0]}>
+        <Text
+          fontSize={0.14}
+          maxWidth={2.8}
+          color="#f8fafc"
+          anchorX="center"
+          anchorY="middle"
+          outlineColor="#020617"
+          outlineWidth={0.02}
+        >
+          {`${id}: ${thought}`}
+        </Text>
+      </Billboard>
+    </group>
+  )
+}
