@@ -202,19 +202,19 @@ export function MissionControlHUD({
   const wrapperStyle: React.CSSProperties =
     dockMode === 'follow'
       ? {
-          position: 'fixed',
-          left: '50%',
-          top: '8%',
-          transform: 'translateX(-50%) translateZ(120px)',
-          zIndex: 10,
-        }
+        position: 'fixed',
+        left: '50%',
+        top: '8%',
+        transform: 'translateX(-50%) translateZ(120px)',
+        zIndex: 10,
+      }
       : {
-          position: 'fixed',
-          right: isXRPresenting ? 6 : 12,
-          top: isXRPresenting ? 6 : 12,
-          zIndex: 10,
-          transform: isXRPresenting ? 'translateZ(45px)' : 'translateZ(80px)',
-        }
+        position: 'fixed',
+        right: isXRPresenting ? 6 : 12,
+        top: isXRPresenting ? 6 : 12,
+        zIndex: 10,
+        transform: isXRPresenting ? 'translateZ(45px)' : 'translateZ(80px)',
+      }
 
   const handleVerifyClick = async () => {
     const isValid = await onVerifyIntegrity()
@@ -327,7 +327,6 @@ export function MissionControlHUD({
           >
             <option value="city-merge">City Merge</option>
             <option value="highway">Highway</option>
-            <option value="roundabout">Roundabout</option>
           </select>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
@@ -667,10 +666,10 @@ export function MissionControlHUD({
         <div
           style={{
             marginTop: 10,
-              border: '1px solid rgba(45, 212, 255, 0.35)',
+            border: '1px solid rgba(45, 212, 255, 0.35)',
             borderRadius: 8,
             padding: 8,
-              background: 'rgba(8, 25, 45, 0.62)',
+            background: 'rgba(8, 25, 45, 0.62)',
           }}
         >
           <div style={{ fontSize: 12, marginBottom: 6, color: '#7edbff' }}>AI Audit Diagnosis</div>

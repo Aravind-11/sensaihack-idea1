@@ -29,39 +29,24 @@ type ScenarioConfig = {
   laneGuides: Vec3Tuple[][]
   dashedMarks: Vec3Tuple[][]
   crosswalks: Array<{ position: Vec3Tuple; rotationY?: number }>
-  arrows: Array<{ position: Vec3Tuple; rotationY?: number }>
   minimapBounds: MinimapBounds
   sky: string
 }
 
-const cityLaneGuides: Vec3Tuple[][] = [
-  [[-6, 0.03, -1.4], [6, 0.03, -1.4]],
-  [[-6, 0.03, 1.4], [6, 0.03, 1.4]],
-  [[-1.4, 0.03, -6], [-1.4, 0.03, 6]],
-  [[1.4, 0.03, -6], [1.4, 0.03, 6]],
-]
+const cityLaneGuides: Vec3Tuple[][] = []
 
 const cityDashedMarks: Vec3Tuple[][] = [
-  [[-6, 0.04, 0], [-5.2, 0.04, 0]],
-  [[-4.2, 0.04, 0], [-3.4, 0.04, 0]],
-  [[-2.4, 0.04, 0], [-1.6, 0.04, 0]],
-  [[1.6, 0.04, 0], [2.4, 0.04, 0]],
-  [[3.4, 0.04, 0], [4.2, 0.04, 0]],
-  [[5.2, 0.04, 0], [6, 0.04, 0]],
-  [[0, 0.04, -6], [0, 0.04, -5.2]],
-  [[0, 0.04, -4.2], [0, 0.04, -3.4]],
-  [[0, 0.04, -2.4], [0, 0.04, -1.6]],
-  [[0, 0.04, 1.6], [0, 0.04, 2.4]],
-  [[0, 0.04, 3.4], [0, 0.04, 4.2]],
-  [[0, 0.04, 5.2], [0, 0.04, 6]],
 ]
 
 const highwayLaneGuides: Vec3Tuple[][] = [
-  [[-12, 0.03, -2.2], [12, 0.03, -2.2]],
-  [[-12, 0.03, 2.2], [12, 0.03, 2.2]],
 ]
 
 const highwayDashedMarks: Vec3Tuple[][] = [
+  [[-25, 0.04, 0], [-23.8, 0.04, 0]],
+  [[-22.4, 0.04, 0], [-21.2, 0.04, 0]],
+  [[-19.8, 0.04, 0], [-18.6, 0.04, 0]],
+  [[-17.2, 0.04, 0], [-16, 0.04, 0]],
+  [[-14.6, 0.04, 0], [-13.4, 0.04, 0]],
   [[-12, 0.04, 0], [-10.8, 0.04, 0]],
   [[-9.4, 0.04, 0], [-8.2, 0.04, 0]],
   [[-6.8, 0.04, 0], [-5.6, 0.04, 0]],
@@ -71,18 +56,12 @@ const highwayDashedMarks: Vec3Tuple[][] = [
   [[3.6, 0.04, 0], [4.8, 0.04, 0]],
   [[6.2, 0.04, 0], [7.4, 0.04, 0]],
   [[8.8, 0.04, 0], [10, 0.04, 0]],
-]
-
-const roundaboutLaneGuides: Vec3Tuple[][] = [
-  [[-8, 0.03, 0], [8, 0.03, 0]],
-  [[0, 0.03, -8], [0, 0.03, 8]],
-]
-
-const roundaboutDashedMarks: Vec3Tuple[][] = [
-  [[-8, 0.04, 0], [-6.8, 0.04, 0]],
-  [[6.8, 0.04, 0], [8, 0.04, 0]],
-  [[0, 0.04, -8], [0, 0.04, -6.8]],
-  [[0, 0.04, 6.8], [0, 0.04, 8]],
+  [[11.4, 0.04, 0], [12.6, 0.04, 0]],
+  [[14, 0.04, 0], [15.2, 0.04, 0]],
+  [[16.6, 0.04, 0], [17.8, 0.04, 0]],
+  [[19.2, 0.04, 0], [20.4, 0.04, 0]],
+  [[21.8, 0.04, 0], [23, 0.04, 0]],
+  [[24.4, 0.04, 0], [25.6, 0.04, 0]],
 ]
 
 const SCENARIOS: Record<ScenarioId, ScenarioConfig> = {
@@ -95,100 +74,16 @@ const SCENARIOS: Record<ScenarioId, ScenarioConfig> = {
       { position: [-3.1, 0.041, 0], rotationY: Math.PI / 2 },
       { position: [3.1, 0.041, 0], rotationY: Math.PI / 2 },
     ],
-    arrows: [
-      { position: [-3.8, 0.041, -1.2], rotationY: 0 },
-      { position: [3.4, 0.041, 1.2], rotationY: Math.PI },
-      { position: [-1.2, 0.041, -3.8], rotationY: Math.PI / 2 },
-      { position: [1.2, 0.041, 3.8], rotationY: -Math.PI / 2 },
-    ],
-    minimapBounds: { minX: -7, maxX: 7, minZ: -7, maxZ: 7 },
+    minimapBounds: { minX: -12, maxX: 12, minZ: -12, maxZ: 12 },
     sky: '#cfe8ff',
   },
   highway: {
     laneGuides: highwayLaneGuides,
     dashedMarks: highwayDashedMarks,
     crosswalks: [],
-    arrows: [
-      { position: [-8.2, 0.041, -1.2], rotationY: 0 },
-      { position: [-4.2, 0.041, 1.2], rotationY: 0 },
-      { position: [1.2, 0.041, -1.2], rotationY: 0 },
-      { position: [6.4, 0.041, 1.2], rotationY: 0 },
-    ],
-    minimapBounds: { minX: -12, maxX: 12, minZ: -4, maxZ: 4 },
+    minimapBounds: { minX: -24, maxX: 24, minZ: -6, maxZ: 6 },
     sky: '#dbeafe',
   },
-  roundabout: {
-    laneGuides: roundaboutLaneGuides,
-    dashedMarks: roundaboutDashedMarks,
-    crosswalks: [
-      { position: [0, 0.041, -5.7] },
-      { position: [0, 0.041, 5.7] },
-      { position: [-5.7, 0.041, 0], rotationY: Math.PI / 2 },
-      { position: [5.7, 0.041, 0], rotationY: Math.PI / 2 },
-    ],
-    arrows: [
-      { position: [0, 0.041, -4], rotationY: Math.PI / 2 },
-      { position: [4, 0.041, 0], rotationY: Math.PI },
-      { position: [0, 0.041, 4], rotationY: -Math.PI / 2 },
-      { position: [-4, 0.041, 0], rotationY: 0 },
-    ],
-    minimapBounds: { minX: -9, maxX: 9, minZ: -9, maxZ: 9 },
-    sky: '#e0f2fe',
-  },
-}
-
-function BuildingBlock({ position, size, color }: { position: Vec3Tuple; size: Vec3Tuple; color: string }) {
-  return (
-    <group position={position}>
-      <mesh castShadow receiveShadow>
-        <boxGeometry args={size} />
-        <meshStandardMaterial color={color} roughness={0.72} metalness={0.2} />
-      </mesh>
-      <mesh position={[0, size[1] * 0.1, size[2] / 2 + 0.01]}>
-        <planeGeometry args={[size[0] * 0.65, size[1] * 0.5]} />
-        <meshStandardMaterial color="#93c5fd" emissive="#60a5fa" emissiveIntensity={0.25} transparent opacity={0.75} />
-      </mesh>
-    </group>
-  )
-}
-
-function Tree({ position }: { position: Vec3Tuple }) {
-  return (
-    <group position={position}>
-      <mesh castShadow position={[0, 0.55, 0]}>
-        <cylinderGeometry args={[0.08, 0.11, 1.1, 10]} />
-        <meshStandardMaterial color="#7c4a24" />
-      </mesh>
-      <mesh castShadow position={[0, 1.45, 0]}>
-        <sphereGeometry args={[0.45, 16, 16]} />
-        <meshStandardMaterial color="#2e7d32" roughness={0.8} />
-      </mesh>
-      <mesh castShadow position={[0.28, 1.25, 0.1]}>
-        <sphereGeometry args={[0.28, 16, 16]} />
-        <meshStandardMaterial color="#388e3c" roughness={0.8} />
-      </mesh>
-      <mesh castShadow position={[-0.24, 1.22, -0.14]}>
-        <sphereGeometry args={[0.26, 16, 16]} />
-        <meshStandardMaterial color="#43a047" roughness={0.8} />
-      </mesh>
-    </group>
-  )
-}
-
-function LampPost({ position }: { position: Vec3Tuple }) {
-  return (
-    <group position={position}>
-      <mesh castShadow>
-        <cylinderGeometry args={[0.05, 0.06, 2.2, 10]} />
-        <meshStandardMaterial color="#475569" />
-      </mesh>
-      <mesh position={[0, 1.18, 0]}>
-        <boxGeometry args={[0.34, 0.08, 0.34]} />
-        <meshStandardMaterial color="#64748b" />
-      </mesh>
-      <pointLight position={[0, 1.1, 0]} color="#fff7cc" intensity={0.2} distance={5.5} />
-    </group>
-  )
 }
 
 const forwardVector = new Vector3()
@@ -343,54 +238,62 @@ function PlayerRig({ onStepTick, onXRPresentingChange }: PlayerRigProps) {
   return <XROrigin ref={originRef} position={[0, 0, 0]} />
 }
 
+/**
+ * Handles the logic and rendering of the traffic lights based on the current scenario and time (tick).
+ */
 function TrafficLights({ tick, scenario }: { tick: number; scenario: ScenarioId }) {
-  const cycle = Math.floor((tick - 1) / 2) % 3
-  const cityState = cycle === 0 ? 'green-x' : cycle === 1 ? 'yellow' : 'green-z'
-  const highwayState = cycle === 0 ? 'green' : cycle === 1 ? 'yellow' : 'red'
   const getColor = (active: boolean, base: string): string => (active ? base : '#111827')
-  const current = scenario === 'city-merge' ? cityState : highwayState
 
   const lightPositions: Vec3Tuple[] =
     scenario === 'city-merge'
-      ? [[-2.8, 1.2, -2.8], [2.8, 1.2, -2.8], [-2.8, 1.2, 2.8], [2.8, 1.2, 2.8]]
-      : scenario === 'highway'
-        ? [[-9.5, 1.2, 0], [0, 1.2, 0], [9.5, 1.2, 0]]
-        : [[0, 1.2, -5.3], [5.3, 1.2, 0], [0, 1.2, 5.3], [-5.3, 1.2, 0]]
+      ? [[-2.8, 1.2, -2.8], [2.8, 1.2, -2.8], [2.8, 1.2, 2.8], [-2.8, 1.2, 2.8]]
+      : [] // No traffic lights for highway or other scenarios
 
   return (
     <group>
-      {lightPositions.map((pos, index) => (
-        <group key={`tl-${index}`} position={pos}>
-          <mesh castShadow>
-            <boxGeometry args={[0.25, 1.4, 0.25]} />
-            <meshStandardMaterial color="#334155" />
-          </mesh>
-          <mesh position={[0, 0.8, 0]}>
-            <boxGeometry args={[0.45, 0.95, 0.18]} />
-            <meshStandardMaterial color="#0f172a" />
-          </mesh>
-          <mesh position={[0, 1.02, 0.1]}>
-            <sphereGeometry args={[0.06, 12, 12]} />
-            <meshStandardMaterial color={getColor(current === 'red', '#ef4444')} emissive={getColor(current === 'red', '#ef4444')} emissiveIntensity={0.65} />
-          </mesh>
-          <mesh position={[0, 0.8, 0.1]}>
-            <sphereGeometry args={[0.06, 12, 12]} />
-            <meshStandardMaterial color={getColor(current === 'yellow', '#f59e0b')} emissive={getColor(current === 'yellow', '#f59e0b')} emissiveIntensity={0.65} />
-          </mesh>
-          <mesh position={[0, 0.58, 0.1]}>
-            <sphereGeometry args={[0.06, 12, 12]} />
-            <meshStandardMaterial
-              color={getColor(current === 'green' || current === 'green-x' || current === 'green-z', '#22c55e')}
-              emissive={getColor(current === 'green' || current === 'green-x' || current === 'green-z', '#22c55e')}
-              emissiveIntensity={0.65}
-            />
-          </mesh>
-        </group>
-      ))}
+      {lightPositions.map((pos, index) => {
+        // Offset the tick by index so they change independently
+        const cycle = Math.floor((tick - 1 + index * 2) / 2) % 3
+        const current = cycle === 0 ? 'red' : cycle === 1 ? 'green' : 'yellow'
+
+        // Rotate 90 degrees (PI/2) for each index
+        const rotationY = (index + 2) * (-Math.PI / 2)
+        return (
+          <group key={`tl-${index}`} position={pos} rotation={[0, rotationY, 0]}>
+            <mesh castShadow>
+              <boxGeometry args={[0.15, 2.4, 0.15]} />
+              <meshStandardMaterial color="#334155" />
+            </mesh>
+            <mesh position={[0, 0.8, 0]}>
+              <boxGeometry args={[0.25, 0.95, 0.25]} />
+              <meshStandardMaterial color="#0f172a" />
+            </mesh>
+            <mesh position={[0, 1.02, 0.1]}>
+              <sphereGeometry args={[0.06, 12, 12]} />
+              <meshStandardMaterial color={getColor(current === 'red', '#ef4444')} emissive={getColor(current === 'red', '#ef4444')} emissiveIntensity={0.65} />
+            </mesh>
+            <mesh position={[0, 0.8, 0.1]}>
+              <sphereGeometry args={[0.06, 12, 12]} />
+              <meshStandardMaterial color={getColor(current === 'yellow', '#f59e0b')} emissive={getColor(current === 'yellow', '#f59e0b')} emissiveIntensity={0.65} />
+            </mesh>
+            <mesh position={[0, 0.58, 0.1]}>
+              <sphereGeometry args={[0.06, 12, 12]} />
+              <meshStandardMaterial
+                color={getColor(current === 'green', '#22c55e')}
+                emissive={getColor(current === 'green', '#22c55e')}
+                emissiveIntensity={0.65}
+              />
+            </mesh>
+          </group>
+        )
+      })}
     </group>
   )
 }
 
+/**
+ * Renders a crosswalk marking on the ground based on a given position and rotation.
+ */
 function Crosswalk({ position, rotationY = 0 }: { position: Vec3Tuple; rotationY?: number }) {
   return (
     <group position={position} rotation={[0, rotationY, 0]}>
@@ -404,88 +307,33 @@ function Crosswalk({ position, rotationY = 0 }: { position: Vec3Tuple; rotationY
   )
 }
 
-function LaneArrow({ position, rotationY = 0 }: { position: Vec3Tuple; rotationY?: number }) {
-  return (
-    <group position={position} rotation={[-Math.PI / 2, 0, rotationY]}>
-      <mesh>
-        <planeGeometry args={[0.95, 0.22]} />
-        <meshStandardMaterial color="#f8fafc" opacity={0.78} transparent />
-      </mesh>
-      <mesh position={[0.52, 0, 0]}>
-        <coneGeometry args={[0.18, 0.36, 3]} />
-        <meshStandardMaterial color="#f8fafc" opacity={0.78} transparent />
-      </mesh>
-    </group>
-  )
-}
-
+/**
+ * Conditionally renders the overall structural geometry, environment blockouts, and details 
+ * based on the selected ScenarioId.
+ */
 function WorldGeometry({ scenario }: { scenario: ScenarioId }) {
   if (scenario === 'highway') {
     return (
       <group>
         <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
           <planeGeometry args={[60, 30]} />
-          <meshStandardMaterial color="#0f172a" roughness={1} />
+          <meshStandardMaterial color="#145e18" roughness={1} />
         </mesh>
         <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-          <planeGeometry args={[56, 8]} />
+          <planeGeometry args={[56, 4.6]} />
           <meshStandardMaterial color="#0b1220" roughness={0.96} />
         </mesh>
-        <mesh position={[0, 0.08, -3.8]} receiveShadow>
+        <mesh position={[0, 0.08, -2.3]} receiveShadow>
           <boxGeometry args={[56, 0.18, 0.22]} />
           <meshStandardMaterial color="#475569" />
         </mesh>
-        <mesh position={[0, 0.08, 3.8]} receiveShadow>
+        <mesh position={[0, 0.08, 2.3]} receiveShadow>
           <boxGeometry args={[56, 0.18, 0.22]} />
           <meshStandardMaterial color="#475569" />
         </mesh>
       </group>
     )
   }
-
-  if (scenario === 'roundabout') {
-    return (
-      <group>
-        <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-          <planeGeometry args={[48, 48]} />
-          <meshStandardMaterial color="#0f172a" roughness={1} />
-        </mesh>
-        <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-          <planeGeometry args={[28, 4.6]} />
-          <meshStandardMaterial color="#0b1220" roughness={0.98} />
-        </mesh>
-        <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-          <planeGeometry args={[4.6, 28]} />
-          <meshStandardMaterial color="#0b1220" roughness={0.98} />
-        </mesh>
-        <mesh position={[0, 0.02, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-          <ringGeometry args={[2.2, 4.2, 48]} />
-          <meshStandardMaterial color="#111827" />
-        </mesh>
-        <mesh position={[0, 0.04, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <circleGeometry args={[1.9, 36]} />
-          <meshStandardMaterial color="#14532d" />
-        </mesh>
-      </group>
-    )
-  }
-
-  const buildingBlocks: Array<{ pos: Vec3Tuple; size: Vec3Tuple; color: string }> = [
-    { pos: [-5.4, 1.6, -4.9], size: [1.8, 3.2, 1.8], color: '#1e293b' },
-    { pos: [-3.2, 1.2, -5.2], size: [1.6, 2.4, 1.6], color: '#334155' },
-    { pos: [3.4, 1.8, -5.0], size: [1.8, 3.6, 1.8], color: '#1e293b' },
-    { pos: [5.5, 1.3, -4.8], size: [1.4, 2.6, 1.6], color: '#334155' },
-    { pos: [-5.3, 1.4, 4.8], size: [1.6, 2.8, 1.7], color: '#334155' },
-    { pos: [-3.0, 1.8, 5.0], size: [1.8, 3.6, 1.8], color: '#1e293b' },
-    { pos: [3.1, 1.1, 5.1], size: [1.6, 2.2, 1.5], color: '#334155' },
-    { pos: [5.5, 1.7, 4.9], size: [1.5, 3.4, 1.7], color: '#1e293b' },
-  ]
-  const treeRows: Vec3Tuple[] = [
-    [-8.4, 0, -8.4], [-5.4, 0, -8.6], [-2.4, 0, -8.2], [0.8, 0, -8.4], [3.8, 0, -8.5], [6.8, 0, -8.1],
-    [-8.5, 0, 8.3], [-5.6, 0, 8.2], [-2.5, 0, 8.4], [0.5, 0, 8.3], [3.6, 0, 8.2], [6.7, 0, 8.5],
-    [-8.4, 0, -5.5], [-8.3, 0, -2.4], [-8.2, 0, 0.6], [-8.6, 0, 3.6], [-8.3, 0, 6.7],
-    [8.5, 0, -5.3], [8.2, 0, -2.2], [8.4, 0, 0.7], [8.3, 0, 3.5], [8.4, 0, 6.8],
-  ]
 
   return (
     <group>
@@ -498,58 +346,37 @@ function WorldGeometry({ scenario }: { scenario: ScenarioId }) {
         <meshStandardMaterial color="#9bcf86" roughness={0.98} />
       </mesh>
       <mesh position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[24, 4.6]} />
+        <planeGeometry args={[24, 3.6]} />
         <meshStandardMaterial color="#303640" roughness={0.98} />
       </mesh>
       <mesh position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[4.6, 24]} />
+        <planeGeometry args={[3.6, 24]} />
         <meshStandardMaterial color="#303640" roughness={0.98} />
       </mesh>
-      <mesh position={[0, 0.031, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[24, 0.3]} />
-        <meshStandardMaterial color="#e2e8f0" roughness={0.9} />
+      <mesh position={[8, 0.031, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[6, 0.1]} />
+        <meshStandardMaterial color="#edac1f" roughness={0.9} />
       </mesh>
-      <mesh position={[0, 0.031, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[0.3, 24]} />
-        <meshStandardMaterial color="#e2e8f0" roughness={0.9} />
+      <mesh position={[0, 0.031, 8]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[0.1, 6]} />
+        <meshStandardMaterial color="#edac1f" roughness={0.9} />
       </mesh>
-      <mesh position={[0, 0.05, -2.55]} receiveShadow>
-        <boxGeometry args={[24, 0.14, 0.22]} />
-        <meshStandardMaterial color="#9ca3af" />
+      <mesh position={[-8, 0.031, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[6, 0.1]} />
+        <meshStandardMaterial color="#edac1f" roughness={0.9} />
       </mesh>
-      <mesh position={[0, 0.05, 2.55]} receiveShadow>
-        <boxGeometry args={[24, 0.14, 0.22]} />
-        <meshStandardMaterial color="#9ca3af" />
+      <mesh position={[0, 0.031, -8]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[0.1, 6]} />
+        <meshStandardMaterial color="#edac1f" roughness={0.9} />
       </mesh>
-      <mesh position={[-2.55, 0.05, 0]} receiveShadow>
-        <boxGeometry args={[0.22, 0.14, 24]} />
-        <meshStandardMaterial color="#9ca3af" />
-      </mesh>
-      <mesh position={[2.55, 0.05, 0]} receiveShadow>
-        <boxGeometry args={[0.22, 0.14, 24]} />
-        <meshStandardMaterial color="#9ca3af" />
-      </mesh>
-
-      {buildingBlocks.map((building, idx) => (
-        <BuildingBlock key={`building-${idx}`} position={building.pos} size={building.size} color={building.color} />
-      ))}
-
-      {treeRows.map((treePos, index) => (
-        <Tree key={`tree-${index}`} position={treePos} />
-      ))}
-
-      {[
-        [-3.4, 0.9, -3.4],
-        [3.4, 0.9, -3.4],
-        [-3.4, 0.9, 3.4],
-        [3.4, 0.9, 3.4],
-      ].map((lamp, index) => (
-        <LampPost key={`lamp-${index}`} position={lamp as Vec3Tuple} />
-      ))}
     </group>
   )
 }
 
+/**
+ * The primary application component. Orchestrates the 3D scene, UI HUD, agent log replays,
+ * scenario swapping, and XR integration.
+ */
 function App() {
   const [logs, setLogs] = useState<AuditEvent[]>([])
   const [currentTick, setCurrentTick] = useState(0)
@@ -862,8 +689,8 @@ function App() {
       dpr: 1,
       shadows: false,
       showSky: true,
-      showGrid: true,
-      showTrails: true,
+      showGrid: false,
+      showTrails: false,
       showInteractionLinks: true,
       showContactShadows: false,
       showEnvironment: false,
@@ -933,9 +760,6 @@ function App() {
           <WorldGeometry scenario={scenario} />
           {worldConfig.crosswalks.map((crosswalk, index) => (
             <Crosswalk key={`crosswalk-${index}`} position={crosswalk.position} rotationY={crosswalk.rotationY} />
-          ))}
-          {worldConfig.arrows.map((arrow, index) => (
-            <LaneArrow key={`arrow-${index}`} position={arrow.position} rotationY={arrow.rotationY} />
           ))}
           <TrafficLights tick={currentTick} scenario={scenario} />
 
