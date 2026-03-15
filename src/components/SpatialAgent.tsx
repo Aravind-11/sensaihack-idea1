@@ -42,7 +42,7 @@ export function SpatialAgent({
       {renderBody && (
         <>
           <mesh castShadow receiveShadow>
-            <boxGeometry args={[0.75, 0.28, 0.45]} />
+            <boxGeometry args={[1.5, 0.56, 0.90]} />
             <meshStandardMaterial
               color={color}
               emissive={color}
@@ -56,26 +56,26 @@ export function SpatialAgent({
             <meshBasicMaterial color={color} transparent opacity={focused ? 0.85 : 0.5} />
           </mesh>
 
-          <mesh position={[-0.24, -0.12, 0.2]} rotation={[0, 0, Math.PI / 2]}>
-            <cylinderGeometry args={[0.08, 0.08, 0.08, 16]} />
+          <mesh position={[-0.5, -0.24, 0.45]} rotation={[0, -Math.PI / 2, Math.PI / 2]}>
+            <cylinderGeometry args={[0.2, 0.2, 0.2, 16]} />
             <meshStandardMaterial color="#0b1120" />
           </mesh>
-          <mesh position={[0.24, -0.12, 0.2]} rotation={[0, 0, Math.PI / 2]}>
-            <cylinderGeometry args={[0.08, 0.08, 0.08, 16]} />
-            <meshStandardMaterial color="#0b1120" />
-          </mesh>
-
-          <mesh position={[-0.24, -0.12, -0.2]} rotation={[0, 0, Math.PI / 2]}>
-            <cylinderGeometry args={[0.08, 0.08, 0.08, 16]} />
-            <meshStandardMaterial color="#0b1120" />
-          </mesh>
-          <mesh position={[0.24, -0.12, -0.2]} rotation={[0, 0, Math.PI / 2]}>
-            <cylinderGeometry args={[0.08, 0.08, 0.08, 16]} />
+          <mesh position={[0.5, -0.24, 0.45]} rotation={[0, -Math.PI / 2, Math.PI / 2]}>
+            <cylinderGeometry args={[0.2, 0.2, 0.2, 16]} />
             <meshStandardMaterial color="#0b1120" />
           </mesh>
 
-          <mesh position={[0.2, 0.03, 0]} rotation={[Math.PI / 2, 0, -Math.PI / 2]}>
-            <coneGeometry args={[0.5, 1.4, 24, 1, true]} />
+          <mesh position={[-0.5, -.12, -0.45]} rotation={[0, -Math.PI / 2, Math.PI / 2]}>
+            <cylinderGeometry args={[0.2, 0.2, 0.2, 16]} />
+            <meshStandardMaterial color="#0b1120" />
+          </mesh>
+          <mesh position={[0.5, -.12, -0.45]} rotation={[0, -Math.PI / 2, Math.PI / 2]}>
+            <cylinderGeometry args={[0.2, 0.2, 0.2, 16]} />
+            <meshStandardMaterial color="#0b1120" />
+          </mesh>
+
+          <mesh position={[1, 0, 0]} rotation={[0, Math.PI, -Math.PI / 2]}>
+            <coneGeometry args={[1, 1.4, 24, 1, true]} />
             <meshStandardMaterial
               color="#67e8f9"
               emissive="#67e8f9"

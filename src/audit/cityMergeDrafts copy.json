@@ -1,0 +1,438 @@
+[
+    {
+        "agent_id": "car-alpha",
+        "steps": [
+            {
+                "thoughts": {
+                    "current": "Heading toward intersection.",
+                    "intent": "Cruise",
+                    "confidence": 0.88
+                },
+                "kinematics": {
+                    "position": [
+                        -1.9942,
+                        6.0
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Cruising, lane clear.",
+                    "intent": "Cruise",
+                    "confidence": 0.89
+                },
+                "kinematics": {
+                    "position": [
+                        -2.0058,
+                        4.7836
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Approaching intersection.",
+                    "intent": "Monitor",
+                    "confidence": 0.9
+                },
+                "kinematics": {
+                    "position": [
+                        -2.076,
+                        4.0117
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Path clear ahead.",
+                    "intent": "Cruise",
+                    "confidence": 0.91
+                },
+                "kinematics": {
+                    "position": [
+                        -2.5673,
+                        2.7602
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Continuing to destination.",
+                    "intent": "Cruise",
+                    "confidence": 0.92
+                },
+                "kinematics": {
+                    "position": [
+                        -3.9474,
+                        2.0936
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Nearly there.",
+                    "intent": "Cruise",
+                    "confidence": 0.93
+                },
+                "kinematics": {
+                    "position": [
+                        -5.4561,
+                        2.0
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Final approach.",
+                    "intent": "Cruise",
+                    "confidence": 0.95
+                },
+                "kinematics": {
+                    "position": [
+                        -6.5906,
+                        2.0234
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Destination reached.",
+                    "intent": "Stop",
+                    "confidence": 0.97
+                },
+                "kinematics": {
+                    "position": [
+                        -7.9591,
+                        2.0
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "agent_id": "car-beta",
+        "steps": [
+            {
+                "thoughts": {
+                    "current": "Heading toward intersection.",
+                    "intent": "Cruise",
+                    "confidence": 0.88
+                },
+                "kinematics": {
+                    "position": [
+                        -7.8538,
+                        -1.9064
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Approaching crossing zone.",
+                    "intent": "Monitor",
+                    "confidence": 0.89
+                },
+                "kinematics": {
+                    "position": [
+                        -4.6842,
+                        -1.9532
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Gamma detected crossing ahead. Stopping to yield.",
+                    "intent": "Yield",
+                    "confidence": 0.91
+                },
+                "kinematics": {
+                    "position": [
+                        -1.1287,
+                        -1.4971
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Holding position. Waiting for car-gamma to clear.",
+                    "intent": "Wait",
+                    "confidence": 0.93
+                },
+                "kinematics": {
+                    "position": [
+                        1.152,
+                        0.269
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Still waiting. Gamma not yet clear.",
+                    "intent": "Wait",
+                    "confidence": 0.93
+                },
+                "kinematics": {
+                    "position": [
+                        1.9708,
+                        2.5146
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Gamma cleared. Proceeding through intersection.",
+                    "intent": "Proceed",
+                    "confidence": 0.94
+                },
+                "kinematics": {
+                    "position": [
+                        2.1345,
+                        5.076
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Crossing complete. Resuming cruise.",
+                    "intent": "Cruise",
+                    "confidence": 0.96
+                },
+                "kinematics": {
+                    "position": [
+                        2.1345,
+                        6.7953
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Destination reached.",
+                    "intent": "Stop",
+                    "confidence": 0.97
+                },
+                "kinematics": {
+                    "position": [
+                        2.1462,
+                        7.9766
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "agent_id": "car-gamma",
+        "steps": [
+            {
+                "thoughts": {
+                    "current": "Westbound cruise, intersection ahead.",
+                    "intent": "Cruise",
+                    "confidence": 0.88
+                },
+                "kinematics": {
+                    "position": [
+                        7.9123,
+                        2.0117
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "E/W traffic has yielded. Proceeding.",
+                    "intent": "Cruise",
+                    "confidence": 0.9
+                },
+                "kinematics": {
+                    "position": [
+                        6.1579,
+                        2.0702
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Entering intersection zone.",
+                    "intent": "Cross",
+                    "confidence": 0.91
+                },
+                "kinematics": {
+                    "position": [
+                        5.1053,
+                        2.0468
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Crossing intersection.",
+                    "intent": "Cross",
+                    "confidence": 0.92
+                },
+                "kinematics": {
+                    "position": [
+                        4.0643,
+                        2.0234
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Crossing intersection.",
+                    "intent": "Cross",
+                    "confidence": 0.93
+                },
+                "kinematics": {
+                    "position": [
+                        4.076,
+                        2.0117
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Intersection cleared.",
+                    "intent": "Cruise",
+                    "confidence": 0.94
+                },
+                "kinematics": {
+                    "position": [
+                        1.9357,
+                        2.0117
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "All clear.",
+                    "intent": "Cruise",
+                    "confidence": 0.96
+                },
+                "kinematics": {
+                    "position": [
+                        -0.9649,
+                        2.0234
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Destination reached.",
+                    "intent": "Stop",
+                    "confidence": 0.97
+                },
+                "kinematics": {
+                    "position": [
+                        -4.076,
+                        2.0117
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "agent_id": "car-delta",
+        "steps": [
+            {
+                "thoughts": {
+                    "current": "Heading toward destination.",
+                    "intent": "Cruise",
+                    "confidence": 0.88
+                },
+                "kinematics": {
+                    "position": [
+                        1.9708,
+                        -7.9181
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Cruising, path clear.",
+                    "intent": "Cruise",
+                    "confidence": 0.89
+                },
+                "kinematics": {
+                    "position": [
+                        2.0409,
+                        -6.0468
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "No conflicts detected.",
+                    "intent": "Cruise",
+                    "confidence": 0.9
+                },
+                "kinematics": {
+                    "position": [
+                        2.0175,
+                        -4.7485
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Continuing route.",
+                    "intent": "Cruise",
+                    "confidence": 0.91
+                },
+                "kinematics": {
+                    "position": [
+                        2.0058,
+                        -4.0117
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "All clear.",
+                    "intent": "Cruise",
+                    "confidence": 0.92
+                },
+                "kinematics": {
+                    "position": [
+                        1.9942,
+                        -4.0
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "All clear.",
+                    "intent": "Cruise",
+                    "confidence": 0.93
+                },
+                "kinematics": {
+                    "position": [
+                        2.8596,
+                        -2.6667
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Final approach.",
+                    "intent": "Cruise",
+                    "confidence": 0.95
+                },
+                "kinematics": {
+                    "position": [
+                        4.9766,
+                        -2.0468
+                    ]
+                }
+            },
+            {
+                "thoughts": {
+                    "current": "Destination reached.",
+                    "intent": "Stop",
+                    "confidence": 0.97
+                },
+                "kinematics": {
+                    "position": [
+                        7.9474,
+                        -1.9649
+                    ]
+                }
+            }
+        ]
+    }
+]

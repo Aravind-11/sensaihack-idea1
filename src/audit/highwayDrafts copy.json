@@ -1,0 +1,185 @@
+[
+  {
+    "tick": 1,
+    "agent_id": "car-alpha",
+    "type": "OBSERVE",
+    "payload": {
+      "thought": "Cruising lane-1; truck ahead 40m.",
+      "intent": "Cruise",
+      "speed_mps": 22,
+      "position": [-8, 0.4, -1.5]
+    }
+  },
+  {
+    "tick": 2,
+    "agent_id": "car-beta",
+    "type": "OBSERVE",
+    "payload": {
+      "thought": "Maintaining lane-2, clear rear.",
+      "intent": "Hold lane",
+      "speed_mps": 20,
+      "position": [-6.2, 0.4, 1.5]
+    }
+  },
+  {
+    "tick": 3,
+    "agent_id": "car-gamma",
+    "type": "THINK",
+    "payload": {
+      "thought": "Predicting safe overtake window.",
+      "intent": "Overtake",
+      "speed_mps": 23,
+      "decision": "Signal left",
+      "position": [-4.8, 0.4, -1.5]
+    }
+  },
+  {
+    "tick": 3,
+    "agent_id": "car-delta",
+    "type": "OBSERVE",
+    "payload": {
+      "thought": "Monitoring far-right lane stability.",
+      "intent": "Escort",
+      "speed_mps": 19.2,
+      "position": [-4.4, 0.4, 3.1]
+    }
+  },
+  {
+    "tick": 4,
+    "agent_id": "car-gamma",
+    "type": "ACTION",
+    "payload": {
+      "thought": "Initiating overtake on lane-1.",
+      "intent": "Pass beta",
+      "interaction": "overtake",
+      "target_agent": "car-beta",
+      "speed_mps": 24,
+      "position": [-3.1, 0.4, 0.2]
+    }
+  },
+  {
+    "tick": 5,
+    "agent_id": "car-beta",
+    "type": "ACTION",
+    "payload": {
+      "thought": "Yielding speed to maintain gap.",
+      "intent": "Yield",
+      "interaction": "yielding-gap",
+      "target_agent": "car-gamma",
+      "speed_mps": 18.5,
+      "position": [-2, 0.4, 1.5]
+    }
+  },
+  {
+    "tick": 6,
+    "agent_id": "car-alpha",
+    "type": "ACTION",
+    "payload": {
+      "thought": "Joining platoon behind gamma.",
+      "intent": "Platoon join",
+      "interaction": "follow",
+      "target_agent": "car-gamma",
+      "speed_mps": 21.3,
+      "position": [-0.8, 0.4, -1.5]
+    }
+  },
+  {
+    "tick": 7,
+    "agent_id": "car-gamma",
+    "type": "OBSERVE",
+    "payload": {
+      "thought": "Left lane clear for 60m.",
+      "intent": "Lead",
+      "speed_mps": 24.5,
+      "seeing": ["car-alpha"],
+      "position": [0.8, 0.4, -1.5]
+    }
+  },
+  {
+    "tick": 8,
+    "agent_id": "car-beta",
+    "type": "THINK",
+    "payload": {
+      "thought": "Preparing merge behind alpha.",
+      "intent": "Merge behind",
+      "decision": "wait 1 tick",
+      "speed_mps": 19.4,
+      "position": [1.6, 0.4, 1.5]
+    }
+  },
+  {
+    "tick": 9,
+    "agent_id": "car-beta",
+    "type": "ACTION",
+    "payload": {
+      "thought": "Merging behind alpha, gap accepted.",
+      "intent": "Merge complete",
+      "interaction": "accepted-gap",
+      "target_agent": "car-alpha",
+      "speed_mps": 20.1,
+      "position": [3.4, 0.4, -0.3]
+    }
+  },
+  {
+    "tick": 9,
+    "agent_id": "car-delta",
+    "type": "ACTION",
+    "payload": {
+      "thought": "Sliding right to avoid compression.",
+      "intent": "Deconflict",
+      "interaction": "yielding-gap",
+      "target_agent": "car-beta",
+      "speed_mps": 18.8,
+      "position": [3.8, 0.4, 2.8]
+    }
+  },
+  {
+    "tick": 10,
+    "agent_id": "car-alpha",
+    "type": "OBSERVE",
+    "payload": {
+      "thought": "Platoon spacing within policy.",
+      "intent": "Stabilize",
+      "speed_mps": 21.6,
+      "seeing": ["car-beta", "car-gamma"],
+      "position": [4.8, 0.4, -1.5]
+    }
+  },
+  {
+    "tick": 11,
+    "agent_id": "car-gamma",
+    "type": "ACTION",
+    "payload": {
+      "thought": "Requesting lane return after pass.",
+      "intent": "Return lane",
+      "interaction": "lane-change",
+      "target_agent": "car-alpha",
+      "speed_mps": 22.9,
+      "position": [6.4, 0.4, 0.4]
+    }
+  },
+  {
+    "tick": 12,
+    "agent_id": "car-alpha",
+    "type": "THINK",
+    "payload": {
+      "thought": "Route solved with no collision risk.",
+      "intent": "Cruise",
+      "confidence": 0.97,
+      "speed_mps": 21.9,
+      "position": [8.2, 0.4, -1.5]
+    }
+  },
+  {
+    "tick": 12,
+    "agent_id": "car-delta",
+    "type": "THINK",
+    "payload": {
+      "thought": "Traffic envelope stable in escort lane.",
+      "intent": "Stabilize",
+      "confidence": 0.93,
+      "speed_mps": 19.3,
+      "position": [8.6, 0.4, 2.8]
+    }
+  }
+]
