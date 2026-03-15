@@ -5,6 +5,28 @@ import type { ScenarioId } from '../audit/clientLog'
 import type { AgentVisualState } from '../types/audit'
 import type { AuditEvent } from '../types/audit'
 
+export type AgentBehaviorProfile = 'cautious' | 'assertive' | 'cooperative' | 'custom'
+
+export interface CustomAgentDraft {
+  id: string
+  color: string
+  position: [number, number, number]
+  speedMps: number
+  intent: string
+  thought: string
+  behavior: AgentBehaviorProfile
+  behaviorNotes: string
+  enableApiPlanning: boolean
+  apiProvider: string
+  apiModel: string
+  apiKey: string
+}
+
+type AddAgentResult = {
+  ok: boolean
+  message: string
+}
+
 type MissionControlHUDProps = {
   logs: AuditEvent[]
   currentTick: number
@@ -14,13 +36,15 @@ type MissionControlHUDProps = {
   isReplayPlaying: boolean
   onReplayToggle: () => void
   onReplayReset: () => void
+  isVerifyingIntegrity: boolean
+  verifyProgress: number
   onVerifyIntegrity: () => Promise<boolean>
   onEnterVR: () => Promise<void> | void
+  onAddAgent: (draft: CustomAgentDraft) => AddAgentResult
   onFocusAgent: (agentId: string | null) => void
   scenario: ScenarioId
   onScenarioChange: (scenario: ScenarioId) => void
   agentStates: Record<string, AgentVisualState>
-  minimapBounds: { minX: number; maxX: number; minZ: number; maxZ: number }
   visibleAgentIds: string[]
   performanceMode: 'low' | 'medium' | 'high'
   onPerformanceModeChange: (mode: 'low' | 'medium' | 'high') => void
@@ -86,13 +110,15 @@ export function MissionControlHUD({
   isReplayPlaying,
   onReplayToggle,
   onReplayReset,
+  isVerifyingIntegrity,
+  verifyProgress,
   onVerifyIntegrity,
   onEnterVR,
+  onAddAgent,
   onFocusAgent,
   scenario,
   onScenarioChange,
   agentStates,
-  minimapBounds,
   visibleAgentIds,
   performanceMode,
   onPerformanceModeChange,
@@ -103,6 +129,22 @@ export function MissionControlHUD({
   const [dockMode, setDockMode] = useState<DockMode>('dock')
   const [selectedLogHash, setSelectedLogHash] = useState<string | null>(null)
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null)
+  const [showAddAgentForm, setShowAddAgentForm] = useState(false)
+  const [addAgentStatus, setAddAgentStatus] = useState('')
+  const [newAgent, setNewAgent] = useState<CustomAgentDraft>({
+    id: 'car-epsilon',
+    color: '#f472b6',
+    position: [1.6, 0.4, -3.4],
+    speedMps: 9.2,
+    intent: 'Patrol',
+    thought: 'Joining mission with local lane policy.',
+    behavior: 'cooperative',
+    behaviorNotes: 'Maintain safe spacing and cooperate on merges.',
+    enableApiPlanning: false,
+    apiProvider: 'openai',
+    apiModel: 'gpt-4o-mini',
+    apiKey: '',
+  })
 
   const visibleLogs = logs.filter(
     (log) => log.tick <= currentTick && (!selectedAgentId || log.agent_id === selectedAgentId),
@@ -113,6 +155,24 @@ export function MissionControlHUD({
   )
   const selectedAgentState = selectedAgentId ? agentStates[selectedAgentId] : null
   const selectedLog = visibleLogs.find((log) => log.hash === selectedLogHash) ?? visibleLogs.at(-1) ?? null
+  const selectedLoopPerception =
+    typeof selectedLog?.payload.loop_perception === 'string'
+      ? selectedLog.payload.loop_perception
+      : `intent=${selectedLog?.payload.intent ?? 'unknown'}; speed=${selectedLog?.payload.speed_mps ?? 'n/a'}`
+  const selectedLoopDecision =
+    typeof selectedLog?.payload.loop_decision === 'string'
+      ? selectedLog.payload.loop_decision
+      : typeof selectedLog?.payload.decision === 'string'
+        ? selectedLog.payload.decision
+        : `Follow ${selectedLog?.type ?? 'UNKNOWN'} policy`
+  const selectedLoopAction =
+    typeof selectedLog?.payload.loop_action === 'string'
+      ? selectedLog.payload.loop_action
+      : `${selectedLog?.type ?? 'UNKNOWN'} -> ${selectedLog?.payload.interaction ?? 'state-update'}`
+  const selectedLoopPolicy =
+    typeof selectedLog?.payload.loop_policy === 'string' ? selectedLog.payload.loop_policy : 'policy.default'
+  const selectedLoopRisk =
+    typeof selectedLog?.payload.loop_risk === 'number' ? selectedLog.payload.loop_risk : selectedLog?.payload.confidence
 
   useEffect(() => {
     if (!selectedAgentId && visibleAgentIds.length > 0) {
@@ -163,6 +223,19 @@ export function MissionControlHUD({
       alert('Audit log integrity failed: chain has been tampered with.')
     }
   }
+  const updateNewAgent = <K extends keyof CustomAgentDraft>(key: K, value: CustomAgentDraft[K]) => {
+    setNewAgent((prev) => ({ ...prev, [key]: value }))
+  }
+  const handleAddAgentSubmit = () => {
+    const result = onAddAgent(newAgent)
+    setAddAgentStatus(result.message)
+    if (!result.ok) return
+    setNewAgent((prev) => ({
+      ...prev,
+      id: `${prev.id}-next`,
+      position: [prev.position[0] + 0.8, prev.position[1], prev.position[2] + 0.4],
+    }))
+  }
 
   return (
     <SpatialDiv component="div" style={wrapperStyle}>
@@ -179,9 +252,16 @@ export function MissionControlHUD({
           <h3 style={{ margin: 0, fontSize: 24, letterSpacing: 0.3, color: '#2dd4ff', textShadow: '0 0 12px rgba(45, 212, 255, 0.25)' }}>
             Mission Control HUD
           </h3>
-          <button style={hudButtonStyle} onClick={() => setDockMode(dockMode === 'dock' ? 'follow' : 'dock')}>
-            {dockMode === 'dock' ? 'Follow User' : 'Dock HUD'}
-          </button>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <button style={hudButtonStyle} onClick={() => setDockMode(dockMode === 'dock' ? 'follow' : 'dock')}>
+              {dockMode === 'dock' ? 'Follow User' : 'Dock HUD'}
+            </button>
+            {isXRPresenting && (
+              <button style={hudButtonStyle} onClick={() => setShowAddAgentForm((open) => !open)}>
+                {showAddAgentForm ? 'Hide Agent' : 'Create Agent'}
+              </button>
+            )}
+          </div>
         </div>
 
         <p style={{ margin: '8px 0 10px', fontSize: 12, color: '#6e8fb3' }}>
@@ -192,8 +272,8 @@ export function MissionControlHUD({
           <button style={hudButtonStyle} onClick={() => void onEnterVR()}>
             Enter VR
           </button>
-          <button style={hudButtonStyle} onClick={handleVerifyClick}>
-            Verify Integrity
+          <button style={hudButtonStyle} onClick={handleVerifyClick} disabled={isVerifyingIntegrity}>
+            {isVerifyingIntegrity ? `Verifying ${Math.round(verifyProgress * 100)}%` : 'Verify Integrity'}
           </button>
           <span
             style={{
@@ -212,6 +292,11 @@ export function MissionControlHUD({
         <div style={{ fontSize: 11, color: '#86cfff', marginBottom: 10, whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
           {xrStatusText}
         </div>
+        {isVerifyingIntegrity && (
+          <div style={{ fontSize: 11, color: '#7dd3fc', marginBottom: 10 }}>
+            Background chain verification running... {Math.round(verifyProgress * 100)}%
+          </div>
+        )}
 
         <label style={{ display: 'block', fontSize: 12, marginBottom: 6, color: '#7ec8ff' }}>
           Replay Scrubber (tick: {currentTick}/{maxTick})
@@ -245,6 +330,165 @@ export function MissionControlHUD({
             <option value="roundabout">Roundabout</option>
           </select>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
+          <button style={hudButtonStyle} onClick={() => setShowAddAgentForm((open) => !open)}>
+            {showAddAgentForm ? 'Close Agent Form' : 'Create Agent'}
+          </button>
+          {addAgentStatus && <span style={{ fontSize: 11, color: '#93c5fd' }}>{addAgentStatus}</span>}
+        </div>
+        {showAddAgentForm && (
+          <div
+            style={{
+              marginBottom: 12,
+              border: '1px solid rgba(56, 189, 248, 0.3)',
+              borderRadius: 8,
+              padding: 8,
+              background: 'rgba(6, 20, 40, 0.72)',
+              display: 'grid',
+              gap: 6,
+            }}
+          >
+            <label style={{ fontSize: 11, color: '#9fd9ff' }}>
+              Agent ID
+              <input
+                value={newAgent.id}
+                onChange={(event) => updateNewAgent('id', event.target.value)}
+                style={{ width: '100%', marginTop: 4, ...hudSelectStyle }}
+              />
+            </label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+              <label style={{ fontSize: 11, color: '#9fd9ff' }}>
+                Color
+                <input
+                  value={newAgent.color}
+                  onChange={(event) => updateNewAgent('color', event.target.value)}
+                  style={{ width: '100%', marginTop: 4, ...hudSelectStyle }}
+                />
+              </label>
+              <label style={{ fontSize: 11, color: '#9fd9ff' }}>
+                Speed (m/s)
+                <input
+                  type="number"
+                  value={newAgent.speedMps}
+                  onChange={(event) => updateNewAgent('speedMps', Number(event.target.value))}
+                  style={{ width: '100%', marginTop: 4, ...hudSelectStyle }}
+                />
+              </label>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+              <label style={{ fontSize: 11, color: '#9fd9ff' }}>
+                Start X
+                <input
+                  type="number"
+                  value={newAgent.position[0]}
+                  onChange={(event) =>
+                    updateNewAgent('position', [
+                      Number(event.target.value),
+                      newAgent.position[1],
+                      newAgent.position[2],
+                    ])
+                  }
+                  style={{ width: '100%', marginTop: 4, ...hudSelectStyle }}
+                />
+              </label>
+              <label style={{ fontSize: 11, color: '#9fd9ff' }}>
+                Start Z
+                <input
+                  type="number"
+                  value={newAgent.position[2]}
+                  onChange={(event) =>
+                    updateNewAgent('position', [
+                      newAgent.position[0],
+                      newAgent.position[1],
+                      Number(event.target.value),
+                    ])
+                  }
+                  style={{ width: '100%', marginTop: 4, ...hudSelectStyle }}
+                />
+              </label>
+            </div>
+            <label style={{ fontSize: 11, color: '#9fd9ff' }}>
+              Intent
+              <input
+                value={newAgent.intent}
+                onChange={(event) => updateNewAgent('intent', event.target.value)}
+                style={{ width: '100%', marginTop: 4, ...hudSelectStyle }}
+              />
+            </label>
+            <label style={{ fontSize: 11, color: '#9fd9ff' }}>
+              Thought
+              <input
+                value={newAgent.thought}
+                onChange={(event) => updateNewAgent('thought', event.target.value)}
+                style={{ width: '100%', marginTop: 4, ...hudSelectStyle }}
+              />
+            </label>
+            <label style={{ fontSize: 11, color: '#9fd9ff' }}>
+              Behavior Profile
+              <select
+                value={newAgent.behavior}
+                onChange={(event) => updateNewAgent('behavior', event.target.value as AgentBehaviorProfile)}
+                style={{ width: '100%', marginTop: 4, ...hudSelectStyle }}
+              >
+                <option value="cautious">Cautious</option>
+                <option value="assertive">Assertive</option>
+                <option value="cooperative">Cooperative</option>
+                <option value="custom">Custom</option>
+              </select>
+            </label>
+            <label style={{ fontSize: 11, color: '#9fd9ff' }}>
+              Behavior Notes
+              <textarea
+                value={newAgent.behaviorNotes}
+                onChange={(event) => updateNewAgent('behaviorNotes', event.target.value)}
+                style={{ width: '100%', marginTop: 4, minHeight: 58, ...hudSelectStyle }}
+              />
+            </label>
+            <label style={{ fontSize: 11, color: '#9fd9ff', display: 'flex', gap: 8, alignItems: 'center' }}>
+              <input
+                type="checkbox"
+                checked={newAgent.enableApiPlanning}
+                onChange={(event) => updateNewAgent('enableApiPlanning', event.target.checked)}
+              />
+              Enable API planning metadata (mock request only)
+            </label>
+            {newAgent.enableApiPlanning && (
+              <>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                  <label style={{ fontSize: 11, color: '#9fd9ff' }}>
+                    API Provider
+                    <input
+                      value={newAgent.apiProvider}
+                      onChange={(event) => updateNewAgent('apiProvider', event.target.value)}
+                      style={{ width: '100%', marginTop: 4, ...hudSelectStyle }}
+                    />
+                  </label>
+                  <label style={{ fontSize: 11, color: '#9fd9ff' }}>
+                    API Model
+                    <input
+                      value={newAgent.apiModel}
+                      onChange={(event) => updateNewAgent('apiModel', event.target.value)}
+                      style={{ width: '100%', marginTop: 4, ...hudSelectStyle }}
+                    />
+                  </label>
+                </div>
+                <label style={{ fontSize: 11, color: '#9fd9ff' }}>
+                  API Key
+                  <input
+                    type="password"
+                    value={newAgent.apiKey}
+                    placeholder="sk-... (stored locally for this session)"
+                    onChange={(event) => updateNewAgent('apiKey', event.target.value)}
+                    style={{ width: '100%', marginTop: 4, ...hudSelectStyle }}
+                  />
+                </label>
+              </>
+            )}
+            <button style={hudButtonStyle} onClick={handleAddAgentSubmit}>
+              Create Agent
+            </button>
+          </div>
+        )}
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
           <label style={{ fontSize: 12, color: '#7ec8ff' }}>Performance</label>
@@ -296,38 +540,6 @@ export function MissionControlHUD({
               </button>
             )
           })}
-        </div>
-
-        <div
-          style={{
-            marginTop: 8,
-            border: '1px solid rgba(56, 189, 248, 0.35)',
-            borderRadius: 8,
-            padding: 8,
-            background: 'rgba(6, 20, 40, 0.72)',
-          }}
-        >
-          <div style={{ fontSize: 12, marginBottom: 6, color: '#7ec8ff' }}>Mini-map</div>
-          <svg viewBox="0 0 220 130" style={{ width: '100%', height: 122, borderRadius: 6, background: '#051326' }}>
-            <rect x="0" y="0" width="220" height="130" fill="#051326" />
-            <line x1="0" y1="65" x2="220" y2="65" stroke="#1f4f78" strokeWidth="1.3" />
-            <line x1="110" y1="0" x2="110" y2="130" stroke="#1f4f78" strokeWidth="1.3" />
-            {Object.entries(agentStates).map(([agentId, state], idx) => {
-              const xNorm = (state.position[0] - minimapBounds.minX) / (minimapBounds.maxX - minimapBounds.minX)
-              const yNorm = (state.position[2] - minimapBounds.minZ) / (minimapBounds.maxZ - minimapBounds.minZ)
-              const x = Math.min(216, Math.max(4, xNorm * 220))
-              const y = Math.min(126, Math.max(4, yNorm * 130))
-              const color = idx % 2 === 0 ? '#22d3ee' : '#818cf8'
-              return (
-                <g key={`mini-${agentId}`}>
-                  <circle cx={x} cy={y} r="4.3" fill={color} />
-                  <text x={x + 6} y={y - 4} fill="#9fd9ff" fontSize="9">
-                    {agentId}
-                  </text>
-                </g>
-              )
-            })}
-          </svg>
         </div>
 
         <h4 style={{ margin: '10px 0 8px', fontSize: 13, letterSpacing: 0.3, color: '#7ec8ff' }}>
@@ -403,6 +615,27 @@ export function MissionControlHUD({
             >
               {JSON.stringify(selectedLog.payload, null, 2)}
             </pre>
+            <div
+              style={{
+                marginTop: 8,
+                borderTop: '1px dashed rgba(56, 189, 248, 0.22)',
+                paddingTop: 8,
+                fontSize: 11,
+                color: '#9fd9ff',
+                lineHeight: 1.4,
+              }}
+            >
+              <div style={{ fontSize: 12, color: '#67e8f9', marginBottom: 4 }}>
+                Agentic Loop: Perception - Decision - Action
+              </div>
+              <div>- Perception: {selectedLoopPerception}</div>
+              <div>- Decision: {selectedLoopDecision}</div>
+              <div>- Action: {selectedLoopAction}</div>
+              <div>
+                - Policy: {selectedLoopPolicy}
+                {selectedLoopRisk !== undefined ? ` | risk=${selectedLoopRisk}` : ''}
+              </div>
+            </div>
           </div>
         )}
 

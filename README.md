@@ -39,6 +39,29 @@ adb reverse tcp:5173 tcp:5173
 # Then open http://localhost:5173 in PICO Browser
 ```
 
+### One-command USB headset flow (simpler)
+
+If your PICO is connected via USB debugging, run:
+
+```bash
+npm run vr:usb
+```
+
+This does three things automatically:
+
+1. waits for device via `adb wait-for-device`
+2. sets reverse port forwarding `tcp:5173 -> tcp:5173`
+3. starts Vite on host mode
+
+Then open `http://localhost:5173` in PICO Browser.
+
+Useful helpers:
+
+```bash
+npm run vr:usb:check   # device + reverse status
+npm run vr:usb:clear   # remove reverse forwarding
+```
+
 ## Project Structure
 
 ```
