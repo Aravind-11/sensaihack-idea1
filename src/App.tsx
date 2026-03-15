@@ -3,9 +3,9 @@ import { ContactShadows, Environment, Grid, Line, OrbitControls, Sky, Text } fro
 import { XR, XROrigin, createXRStore } from '@react-three/xr'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
-import { buildDemoLogChain, type ScenarioId, verifyLogChain } from './audit/clientLog'
+import { buildDemoLogChain, type ScenarioId, verifyLogChainInBatches } from './audit/clientLog'
 import { buildAgentStateAtTick, getInteractionsAtTick, getMaxTick } from './audit/replay'
-import { MissionControlHUD } from './components/MissionControl'
+import { MissionControlHUD, type CustomAgentDraft } from './components/MissionControl'
 import { SpatialAgent } from './components/SpatialAgent'
 import type { AgentInteraction, AuditEvent, Vec3Tuple } from './types/audit'
 import { Vector3, type Group } from 'three'
@@ -16,6 +16,13 @@ const xrStore = createXRStore({
 })
 const MAX_HUD_AGENTS = 4
 type PerformanceMode = 'low' | 'medium' | 'high'
+type RuntimeAgent = CustomAgentDraft & { createdAtTick: number }
+type MockAgentPlanRequest = {
+  endpoint: string
+  method: 'POST'
+  headers: Record<string, string>
+  body: Record<string, unknown>
+}
 
 type MinimapBounds = { minX: number; maxX: number; minZ: number; maxZ: number }
 type ScenarioConfig = {
@@ -86,6 +93,42 @@ const KEYBOARD_DEADZONE = 0.01
 const CONTROLLER_DEADZONE = 0.18
 const TURN_INPUT_DEADZONE = 0.65
 const SNAP_TURN_RADIANS = Math.PI / 8
+
+type DirectionalRuntimeAgentState = {
+  visual: { position: Vec3Tuple; thought: string; intent: string; speed_mps: number; seeing: string[] }
+  color: string
+  direction: Vec3Tuple
+}
+
+const buildMockAgentPlanRequest = (
+  agent: RuntimeAgent,
+  snapshot: { tick: number; speedMps: number; position: Vec3Tuple; intent: string },
+): MockAgentPlanRequest => {
+  // Intentionally no fetch() call: we only model request payload/headers for explainability.
+  return {
+    endpoint: `https://api.${agent.apiProvider}.com/v1/chat/completions`,
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${agent.apiKey || '<missing-key>'}`,
+      'Content-Type': 'application/json',
+      'X-Agent-ID': agent.id,
+    },
+    body: {
+      model: agent.apiModel,
+      temperature: 0.2,
+      messages: [
+        {
+          role: 'system',
+          content: `You are the planner for ${agent.id}. Behavior profile=${agent.behavior}.`,
+        },
+        {
+          role: 'user',
+          content: `tick=${snapshot.tick}, intent=${snapshot.intent}, speed=${snapshot.speedMps}, position=${snapshot.position.join(',')}.`,
+        },
+      ],
+    },
+  }
+}
 
 type PlayerRigProps = {
   onStepTick: (delta: number) => void
@@ -337,6 +380,7 @@ function WorldGeometry({ scenario }: { scenario: ScenarioId }) {
 function App() {
   const [logs, setLogs] = useState<AuditEvent[]>([])
   const [currentTick, setCurrentTick] = useState(0)
+  const [runtimeAgents, setRuntimeAgents] = useState<RuntimeAgent[]>([])
   const [isReplayPlaying, setIsReplayPlaying] = useState(false)
   const [isXRPresenting, setIsXRPresenting] = useState(false)
   const [focusedAgentId, setFocusedAgentId] = useState<string | null>(null)
@@ -344,6 +388,8 @@ function App() {
   const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('medium')
   const [xrDiagText, setXrDiagText] = useState('')
   const [xrActionText, setXrActionText] = useState('')
+  const [isVerifyingIntegrity, setIsVerifyingIntegrity] = useState(false)
+  const [verifyProgress, setVerifyProgress] = useState(0)
 
   useEffect(() => {
     let active = true
@@ -351,6 +397,7 @@ function App() {
       if (!active) return
       setLogs(chain)
       setCurrentTick(getMaxTick(chain))
+      setRuntimeAgents([])
       setIsReplayPlaying(false)
       setFocusedAgentId(null)
     })
@@ -381,6 +428,75 @@ function App() {
     [agentStates, visibleAgentIds],
   )
   const interactions = useMemo<AgentInteraction[]>(() => getInteractionsAtTick(logs, currentTick), [logs, currentTick])
+  const runtimeAgentStates = useMemo(() => {
+    const evaluateMotion = (agent: RuntimeAgent, elapsed: number): { x: number; z: number; speed: number } => {
+      const baseX = agent.position[0]
+      const baseZ = agent.position[2]
+      let x = baseX
+      let z = baseZ
+      let speed = agent.speedMps
+      if (agent.behavior === 'cautious') {
+        x = baseX + Math.sin(elapsed * 0.24) * 0.7
+        z = baseZ + Math.cos(elapsed * 0.2) * 0.4
+        speed = Math.max(1.2, agent.speedMps * 0.75)
+      } else if (agent.behavior === 'assertive') {
+        x = baseX + elapsed * 0.22
+        z = baseZ + Math.sin(elapsed * 0.32) * 0.5
+        speed = agent.speedMps * 1.2
+      } else if (agent.behavior === 'cooperative') {
+        x = baseX + Math.sin(elapsed * 0.27) * 1.1
+        z = baseZ + Math.cos(elapsed * 0.27) * 1.1
+        speed = agent.speedMps
+      } else {
+        const noteHash = agent.behaviorNotes
+          .split('')
+          .reduce((sum, ch) => sum + ch.charCodeAt(0), 0)
+        const drift = ((noteHash % 7) + 2) / 20
+        x = baseX + Math.sin(elapsed * drift) * 0.9
+        z = baseZ + Math.cos(elapsed * drift) * 0.6
+      }
+      return { x, z, speed }
+    }
+
+    const state: Record<string, DirectionalRuntimeAgentState> = {}
+    for (const agent of runtimeAgents) {
+      const elapsed = Math.max(0, currentTick - agent.createdAtTick)
+      const now = evaluateMotion(agent, elapsed)
+      const next = evaluateMotion(agent, elapsed + 0.45)
+      const dx = next.x - now.x
+      const dz = next.z - now.z
+      const magnitude = Math.hypot(dx, dz) || 1
+      state[agent.id] = {
+        visual: {
+          position: [now.x, 0.4, now.z],
+          thought: `${agent.thought} [${agent.behavior}]`,
+          intent: agent.intent,
+          speed_mps: Number(now.speed.toFixed(1)),
+          seeing: [],
+        },
+        color: agent.color,
+        direction: [dx / magnitude, 0, dz / magnitude],
+      }
+      if (agent.enableApiPlanning) {
+        const mockPlan = buildMockAgentPlanRequest(agent, {
+          tick: currentTick,
+          speedMps: Number(now.speed.toFixed(1)),
+          position: [now.x, 0.4, now.z],
+          intent: agent.intent,
+        })
+        const keyState = agent.apiKey ? 'key:set' : 'key:missing'
+        state[agent.id].visual.thought = `${agent.thought} [api-plan:${mockPlan.body.model} ${keyState}]`
+      }
+    }
+    return state
+  }, [runtimeAgents, currentTick])
+  const mergedAgentStates = useMemo(
+    () => ({
+      ...visibleAgentStates,
+      ...Object.fromEntries(Object.entries(runtimeAgentStates).map(([id, data]) => [id, data.visual])),
+    }),
+    [visibleAgentStates, runtimeAgentStates],
+  )
   const handleTickChange = useCallback((tick: number) => {
     setCurrentTick(tick)
     setIsReplayPlaying(false)
@@ -423,7 +539,65 @@ function App() {
     }
     return trails
   }, [visibleLogs, currentTick])
-  const verifyIntegrity = async (): Promise<boolean> => verifyLogChain(logs)
+  const visibleAgentDirections = useMemo(() => {
+    const perAgent: Record<string, Vec3Tuple> = {}
+    const recentPositions: Record<string, Vec3Tuple[]> = {}
+    for (const event of visibleLogs) {
+      if (event.tick > currentTick || !Array.isArray(event.payload.position)) continue
+      const pos = event.payload.position as Vec3Tuple
+      if (!recentPositions[event.agent_id]) recentPositions[event.agent_id] = []
+      recentPositions[event.agent_id].push(pos)
+      if (recentPositions[event.agent_id].length > 3) recentPositions[event.agent_id].shift()
+    }
+    for (const [agentId, points] of Object.entries(recentPositions)) {
+      if (points.length < 2) {
+        perAgent[agentId] = [1, 0, 0]
+        continue
+      }
+      const start = points[points.length - 2]
+      const end = points[points.length - 1]
+      const dx = end[0] - start[0]
+      const dz = end[2] - start[2]
+      const mag = Math.hypot(dx, dz)
+      perAgent[agentId] = mag > 0.0001 ? [dx / mag, 0, dz / mag] : [1, 0, 0]
+    }
+    return perAgent
+  }, [visibleLogs, currentTick])
+  const verifyIntegrity = useCallback(async (): Promise<boolean> => {
+    setIsVerifyingIntegrity(true)
+    setVerifyProgress(0)
+    try {
+      return await verifyLogChainInBatches(logs, undefined, setVerifyProgress)
+    } finally {
+      setIsVerifyingIntegrity(false)
+    }
+  }, [logs])
+  const handleAddAgent = useCallback(
+    (draft: CustomAgentDraft): { ok: boolean; message: string } => {
+      const id = draft.id.trim()
+      if (!id) return { ok: false, message: 'Agent ID is required.' }
+      const existingLogIds = new Set(logs.map((event) => event.agent_id))
+      const existingRuntimeIds = new Set(runtimeAgents.map((agent) => agent.id))
+      if (existingLogIds.has(id) || existingRuntimeIds.has(id)) {
+        return { ok: false, message: `Agent "${id}" already exists.` }
+      }
+      const normalized: RuntimeAgent = {
+        ...draft,
+        id,
+        intent: draft.intent.trim() || 'Patrol',
+        thought: draft.thought.trim() || 'Monitoring lane and maintaining policy.',
+        behaviorNotes: draft.behaviorNotes.trim() || 'No custom notes.',
+        speedMps: Number.isFinite(draft.speedMps) ? Math.max(0.5, draft.speedMps) : 4,
+        createdAtTick: currentTick,
+      }
+      setRuntimeAgents((prev) => [...prev, normalized])
+      const apiHint = normalized.enableApiPlanning
+        ? ` API mock enabled (${normalized.apiProvider}/${normalized.apiModel}).`
+        : ''
+      return { ok: true, message: `Agent "${id}" added with ${normalized.behavior} behavior.${apiHint}` }
+    },
+    [logs, runtimeAgents, currentTick],
+  )
 
   useEffect(() => {
     const runDiag = async () => {
@@ -533,13 +707,15 @@ function App() {
         isReplayPlaying={isReplayPlaying}
         onReplayToggle={handleReplayToggle}
         onReplayReset={handleReplayReset}
+        isVerifyingIntegrity={isVerifyingIntegrity}
+        verifyProgress={verifyProgress}
         onVerifyIntegrity={verifyIntegrity}
         onEnterVR={handleEnterVR}
+        onAddAgent={handleAddAgent}
         onFocusAgent={setFocusedAgentId}
         scenario={scenario}
         onScenarioChange={setScenario}
-        agentStates={visibleAgentStates}
-        minimapBounds={worldConfig.minimapBounds}
+        agentStates={mergedAgentStates}
         visibleAgentIds={visibleAgentIds}
         performanceMode={performanceMode}
         onPerformanceModeChange={setPerformanceMode}
@@ -600,10 +776,26 @@ function App() {
               id={agentId}
               position={state.position}
               thought={state.thought}
+              direction={visibleAgentDirections[agentId] ?? [1, 0, 0]}
               intent={state.intent}
               speedMps={state.speed_mps}
               seeing={state.seeing}
               color={index % 2 === 0 ? '#7dd3fc' : '#a78bfa'}
+              focused={focusedAgentId === agentId}
+              renderBody
+            />
+          ))}
+          {Object.entries(runtimeAgentStates).map(([agentId, state]) => (
+            <SpatialAgent
+              key={agentId}
+              id={agentId}
+              position={state.visual.position}
+              thought={state.visual.thought}
+              direction={state.direction}
+              intent={state.visual.intent}
+              speedMps={state.visual.speed_mps}
+              seeing={state.visual.seeing}
+              color={state.color}
               focused={focusedAgentId === agentId}
               renderBody
             />

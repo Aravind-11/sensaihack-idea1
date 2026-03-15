@@ -1,6 +1,7 @@
 import type { AuditEvent, AuditEventPayload, AuditEventType } from '../types/audit'
 import cityMergeDraftsRaw from './cityMergeDrafts.json'
 import highwayDraftsRaw from './highwayDrafts.json'
+import { enrichWithDecisionLoop } from './agentLoop'
 
 const DEMO_SECRET = 'demo-webspatial-hmac-secret'
 const ZERO_HASH = '0'.repeat(64)
@@ -72,8 +73,12 @@ const getScenarioDrafts = (scenario: ScenarioId): DraftAuditEvent[] => {
 export const buildDemoLogChain = async (scenario: ScenarioId = 'city-merge'): Promise<AuditEvent[]> => {
   const drafts = getScenarioDrafts(scenario)
   const chain: AuditEvent[] = []
+  const memoryByAgent = new Map<string, { lastIntent: string; lastSpeed: number; lastSeenCount: number }>()
   for (const draft of drafts) {
-    const nextEvent = await appendClientEvent(chain.at(-1), draft)
+    const memory = memoryByAgent.get(draft.agent_id)
+    const loop = enrichWithDecisionLoop(draft, memory)
+    memoryByAgent.set(draft.agent_id, loop.nextMemory)
+    const nextEvent = await appendClientEvent(chain.at(-1), { ...draft, payload: loop.payload })
     chain.push(nextEvent)
   }
   return chain
@@ -115,5 +120,55 @@ export const verifyLogChain = async (logs: AuditEvent[], secret = DEMO_SECRET): 
     }
   }
 
+  return true
+}
+
+export const verifyLogChainInBatches = async (
+  logs: AuditEvent[],
+  secret = DEMO_SECRET,
+  onProgress?: (progress01: number) => void,
+  batchSize = 16,
+): Promise<boolean> => {
+  onProgress?.(0)
+  for (let i = 0; i < logs.length; i += 1) {
+    const current = logs[i]
+    const previous = logs[i - 1]
+    const expectedPrevHash = previous?.hash ?? ZERO_HASH
+    if (current.prev_hash !== expectedPrevHash) {
+      onProgress?.(1)
+      return false
+    }
+    const expectedSignature = await computeSignature(
+      {
+        tick: current.tick,
+        agent_id: current.agent_id,
+        type: current.type,
+        payload: current.payload,
+      },
+      current.prev_hash,
+      secret,
+    )
+    if (current.signature !== expectedSignature) {
+      onProgress?.(1)
+      return false
+    }
+    const expectedHash = await computeEventHash({
+      tick: current.tick,
+      agent_id: current.agent_id,
+      type: current.type,
+      payload: current.payload,
+      prev_hash: current.prev_hash,
+      signature: current.signature,
+    })
+    if (current.hash !== expectedHash) {
+      onProgress?.(1)
+      return false
+    }
+    if ((i + 1) % batchSize === 0) {
+      onProgress?.((i + 1) / Math.max(1, logs.length))
+      await new Promise<void>((resolve) => window.setTimeout(resolve, 0))
+    }
+  }
+  onProgress?.(1)
   return true
 }
