@@ -142,19 +142,19 @@ export function MissionControlHUD({
   const wrapperStyle: React.CSSProperties =
     dockMode === 'follow'
       ? {
-          position: 'fixed',
-          left: '50%',
-          top: '8%',
-          transform: 'translateX(-50%) translateZ(120px)',
-          zIndex: 10,
-        }
+        position: 'fixed',
+        left: '50%',
+        top: '8%',
+        transform: 'translateX(-50%) translateZ(120px)',
+        zIndex: 10,
+      }
       : {
-          position: 'fixed',
-          right: isXRPresenting ? 6 : 12,
-          top: isXRPresenting ? 6 : 12,
-          zIndex: 10,
-          transform: isXRPresenting ? 'translateZ(45px)' : 'translateZ(80px)',
-        }
+        position: 'fixed',
+        right: isXRPresenting ? 6 : 12,
+        top: isXRPresenting ? 6 : 12,
+        zIndex: 10,
+        transform: isXRPresenting ? 'translateZ(45px)' : 'translateZ(80px)',
+      }
 
   const handleVerifyClick = async () => {
     const isValid = await onVerifyIntegrity()
@@ -242,7 +242,6 @@ export function MissionControlHUD({
           >
             <option value="city-merge">City Merge</option>
             <option value="highway">Highway</option>
-            <option value="roundabout">Roundabout</option>
           </select>
         </div>
 
@@ -308,14 +307,18 @@ export function MissionControlHUD({
           }}
         >
           <div style={{ fontSize: 12, marginBottom: 6, color: '#7ec8ff' }}>Mini-map</div>
-          <svg viewBox="0 0 220 130" style={{ width: '100%', height: 122, borderRadius: 6, background: '#051326' }}>
-            <rect x="0" y="0" width="220" height="130" fill="#051326" />
-            <line x1="0" y1="65" x2="220" y2="65" stroke="#1f4f78" strokeWidth="1.3" />
-            <line x1="110" y1="0" x2="110" y2="130" stroke="#1f4f78" strokeWidth="1.3" />
+          <svg viewBox="0 0 130 130" style={{ width: '100%', height: isXRPresenting ? 180 : 220, borderRadius: 6, background: '#051326' }}>
+            <rect x="0" y="0" width="130" height="130" fill="#051326" />
+            {/* <line x1="0" y1="65" x2="130" y2="65" stroke="#1f4f78" strokeWidth="1.3" />
+            <line x1="65" y1="0" x2="65" y2="130" stroke="#1f4f78" strokeWidth="1.3" /> */}
+            <line x1="0" y1="55" x2="130" y2="55" stroke="#18532f" strokeWidth="1" />
+            <line x1="0" y1="75" x2="130" y2="75" stroke="#18532f" strokeWidth="1" />
+            <line x1="55" y1="0" x2="55" y2="130" stroke="#18532f" strokeWidth="1" />
+            <line x1="75" y1="0" x2="75" y2="130" stroke="#18532f" strokeWidth="1" />
             {Object.entries(agentStates).map(([agentId, state], idx) => {
               const xNorm = (state.position[0] - minimapBounds.minX) / (minimapBounds.maxX - minimapBounds.minX)
               const yNorm = (state.position[2] - minimapBounds.minZ) / (minimapBounds.maxZ - minimapBounds.minZ)
-              const x = Math.min(216, Math.max(4, xNorm * 220))
+              const x = Math.min(126, Math.max(4, xNorm * 130))
               const y = Math.min(126, Math.max(4, yNorm * 130))
               const color = idx % 2 === 0 ? '#22d3ee' : '#818cf8'
               return (
@@ -434,10 +437,10 @@ export function MissionControlHUD({
         <div
           style={{
             marginTop: 10,
-              border: '1px solid rgba(45, 212, 255, 0.35)',
+            border: '1px solid rgba(45, 212, 255, 0.35)',
             borderRadius: 8,
             padding: 8,
-              background: 'rgba(8, 25, 45, 0.62)',
+            background: 'rgba(8, 25, 45, 0.62)',
           }}
         >
           <div style={{ fontSize: 12, marginBottom: 6, color: '#7edbff' }}>AI Audit Diagnosis</div>

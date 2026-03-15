@@ -7,4 +7,7 @@ export default defineConfig({
   resolve: {
     dedupe: ['three'],
   },
+  server: {
+    open: true, // Automatically open the app in the default browser
+  },
 })

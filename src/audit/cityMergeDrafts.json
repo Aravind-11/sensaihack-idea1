@@ -1,0 +1,752 @@
+[
+    {
+        "tick": 1,
+        "agent_id": "car-alpha",
+        "type": "OBSERVE",
+        "payload": {
+            "thought": "Heading toward intersection.",
+            "intent": "Cruise",
+            "position": [
+                1.0,
+                0.4,
+                12.0
+            ],
+            "confidence": 0.88
+        }
+    },
+    {
+        "tick": 1,
+        "agent_id": "car-beta",
+        "type": "OBSERVE",
+        "payload": {
+            "thought": "Heading toward intersection.",
+            "intent": "Cruise",
+            "position": [
+                12.0,
+                0.4,
+                -1.0
+            ],
+            "confidence": 0.88
+        }
+    },
+    {
+        "tick": 1,
+        "agent_id": "car-delta",
+        "type": "OBSERVE",
+        "payload": {
+            "thought": "Heading toward destination.",
+            "intent": "Cruise",
+            "position": [
+                -1.0,
+                0.4,
+                -12.0
+            ],
+            "confidence": 0.88
+        }
+    },
+    {
+        "tick": 1,
+        "agent_id": "car-gamma",
+        "type": "OBSERVE",
+        "payload": {
+            "thought": "Westbound cruise, intersection ahead.",
+            "intent": "Cruise",
+            "position": [
+                -12.0,
+                0.4,
+                1.0
+            ],
+            "confidence": 0.88
+        }
+    },
+    {
+        "tick": 2,
+        "agent_id": "car-alpha",
+        "type": "OBSERVE",
+        "payload": {
+            "thought": "Cruising, lane clear.",
+            "intent": "Cruise",
+            "position": [
+                1.0,
+                0.4,
+                10.0
+            ],
+            "confidence": 0.89
+        }
+    },
+    {
+        "tick": 2,
+        "agent_id": "car-beta",
+        "type": "THINK",
+        "payload": {
+            "thought": "Approaching crossing zone.",
+            "intent": "Monitor",
+            "position": [
+                10.0,
+                0.4,
+                -1.0
+            ],
+            "confidence": 0.89
+        }
+    },
+    {
+        "tick": 2,
+        "agent_id": "car-delta",
+        "type": "OBSERVE",
+        "payload": {
+            "thought": "Cruising, path clear.",
+            "intent": "Cruise",
+            "position": [
+                -1.0,
+                0.4,
+                -10.0
+            ],
+            "confidence": 0.89
+        }
+    },
+    {
+        "tick": 2,
+        "agent_id": "car-gamma",
+        "type": "OBSERVE",
+        "payload": {
+            "thought": "E/W traffic has yielded. Proceeding.",
+            "intent": "Cruise",
+            "position": [
+                -9.0,
+                0.4,
+                1.0
+            ],
+            "confidence": 0.9
+        }
+    },
+    {
+        "tick": 3,
+        "agent_id": "car-alpha",
+        "type": "THINK",
+        "payload": {
+            "thought": "Approaching intersection.",
+            "intent": "Monitor",
+            "position": [
+                1.0,
+                0.4,
+                8.0
+            ],
+            "confidence": 0.9
+        }
+    },
+    {
+        "tick": 3,
+        "agent_id": "car-beta",
+        "type": "ACTION",
+        "payload": {
+            "thought": "Gamma detected crossing ahead. Stopping to yield.",
+            "intent": "Yield",
+            "position": [
+                8.0,
+                0.4,
+                -1.0
+            ],
+            "confidence": 0.91
+        }
+    },
+    {
+        "tick": 3,
+        "agent_id": "car-delta",
+        "type": "OBSERVE",
+        "payload": {
+            "thought": "No conflicts detected.",
+            "intent": "Cruise",
+            "position": [
+                -1.0,
+                0.4,
+                -8.0
+            ],
+            "confidence": 0.9
+        }
+    },
+    {
+        "tick": 3,
+        "agent_id": "car-gamma",
+        "type": "ACTION",
+        "payload": {
+            "thought": "Entering intersection zone.",
+            "intent": "Cross",
+            "position": [
+                -6.0,
+                0.4,
+                1.0
+            ],
+            "confidence": 0.91
+        }
+    },
+    {
+        "tick": 4,
+        "agent_id": "car-alpha",
+        "type": "OBSERVE",
+        "payload": {
+            "thought": "Path clear ahead.",
+            "intent": "Cruise",
+            "position": [
+                1.0,
+                0.4,
+                6.0
+            ],
+            "confidence": 0.91
+        }
+    },
+    {
+        "tick": 4,
+        "agent_id": "car-beta",
+        "type": "ACTION",
+        "payload": {
+            "thought": "Holding position. Waiting for car-gamma to clear.",
+            "intent": "Wait",
+            "position": [
+                6.0,
+                0.4,
+                -1.0
+            ],
+            "confidence": 0.93
+        }
+    },
+    {
+        "tick": 4,
+        "agent_id": "car-delta",
+        "type": "OBSERVE",
+        "payload": {
+            "thought": "Continuing route.",
+            "intent": "Cruise",
+            "position": [
+                -1.0,
+                0.4,
+                -6.0
+            ],
+            "confidence": 0.91
+        }
+    },
+    {
+        "tick": 4,
+        "agent_id": "car-gamma",
+        "type": "ACTION",
+        "payload": {
+            "thought": "Crossing intersection.",
+            "intent": "Cross",
+            "position": [
+                -2.5,
+                0.4,
+                1.0
+            ],
+            "confidence": 0.92
+        }
+    },
+    {
+        "tick": 5,
+        "agent_id": "car-alpha",
+        "type": "OBSERVE",
+        "payload": {
+            "thought": "Continuing to destination.",
+            "intent": "Cruise",
+            "position": [
+                1.0,
+                0.4,
+                4.0
+            ],
+            "confidence": 0.92
+        }
+    },
+    {
+        "tick": 5,
+        "agent_id": "car-beta",
+        "type": "ACTION",
+        "payload": {
+            "thought": "Still waiting. Gamma not yet clear.",
+            "intent": "Wait",
+            "position": [
+                4.0,
+                0.4,
+                -1.0
+            ],
+            "confidence": 0.93
+        }
+    },
+    {
+        "tick": 5,
+        "agent_id": "car-delta",
+        "type": "OBSERVE",
+        "payload": {
+            "thought": "All clear.",
+            "intent": "Cruise",
+            "position": [
+                -1.0,
+                0.4,
+                -5.0
+            ],
+            "confidence": 0.92
+        }
+    },
+    {
+        "tick": 5,
+        "agent_id": "car-gamma",
+        "type": "ACTION",
+        "payload": {
+            "thought": "Crossing intersection.",
+            "intent": "Cross",
+            "position": [
+                1.0,
+                0.4,
+                1.0
+            ],
+            "confidence": 0.93
+        }
+    },
+    {
+        "tick": 6,
+        "agent_id": "car-alpha",
+        "type": "OBSERVE",
+        "payload": {
+            "thought": "Nearly there.",
+            "intent": "Cruise",
+            "position": [
+                1.0,
+                0.4,
+                4.0
+            ],
+            "confidence": 0.93
+        }
+    },
+    {
+        "tick": 6,
+        "agent_id": "car-beta",
+        "type": "ACTION",
+        "payload": {
+            "thought": "Gamma cleared. Proceeding through intersection.",
+            "intent": "Proceed",
+            "position": [
+                2.0,
+                0.4,
+                -1.0
+            ],
+            "confidence": 0.94
+        }
+    },
+    {
+        "tick": 6,
+        "agent_id": "car-delta",
+        "type": "OBSERVE",
+        "payload": {
+            "thought": "All clear.",
+            "intent": "Cruise",
+            "position": [
+                -1.0,
+                0.4,
+                -3.0
+            ],
+            "confidence": 0.93
+        }
+    },
+    {
+        "tick": 6,
+        "agent_id": "car-gamma",
+        "type": "OBSERVE",
+        "payload": {
+            "thought": "Intersection cleared.",
+            "intent": "Cruise",
+            "position": [
+                4.0,
+                0.4,
+                1.0
+            ],
+            "confidence": 0.94
+        }
+    },
+    {
+        "tick": 7,
+        "agent_id": "car-alpha",
+        "type": "OBSERVE",
+        "payload": {
+            "thought": "Final approach.",
+            "intent": "Cruise",
+            "position": [
+                1.0,
+                0.4,
+                4.0
+            ],
+            "confidence": 0.95
+        }
+    },
+    {
+        "tick": 7,
+        "agent_id": "car-beta",
+        "type": "OBSERVE",
+        "payload": {
+            "thought": "Crossing complete. Resuming cruise.",
+            "intent": "Cruise",
+            "position": [
+                -0.0,
+                0.4,
+                0.0
+            ],
+            "confidence": 0.96
+        }
+    },
+    {
+        "tick": 7,
+        "agent_id": "car-delta",
+        "type": "OBSERVE",
+        "payload": {
+            "thought": "Final approach.",
+            "intent": "Cruise",
+            "position": [
+                -1.5,
+                0.4,
+                -1.5
+            ],
+            "confidence": 0.95
+        }
+    },
+    {
+        "tick": 7,
+        "agent_id": "car-gamma",
+        "type": "OBSERVE",
+        "payload": {
+            "thought": "All clear.",
+            "intent": "Cruise",
+            "position": [
+                7.5,
+                0.4,
+                1.0
+            ],
+            "confidence": 0.96
+        }
+    },
+    {
+        "tick": 8,
+        "agent_id": "car-alpha",
+        "type": "ACTION",
+        "payload": {
+            "thought": "Destination reached.",
+            "intent": "Stop",
+            "position": [
+                1.0,
+                0.4,
+                4.0
+            ],
+            "confidence": 0.97
+        }
+    },
+    {
+        "tick": 8,
+        "agent_id": "car-beta",
+        "type": "ACTION",
+        "payload": {
+            "thought": "Destination reached.",
+            "intent": "Stop",
+            "position": [
+                -1.0,
+                0.4,
+                2.0
+            ],
+            "confidence": 0.97
+        }
+    },
+    {
+        "tick": 8,
+        "agent_id": "car-delta",
+        "type": "ACTION",
+        "payload": {
+            "thought": "Destination reached.",
+            "intent": "Stop",
+            "position": [
+                -3.0,
+                0.4,
+                -1.0
+            ],
+            "confidence": 0.97
+        }
+    },
+    {
+        "tick": 8,
+        "agent_id": "car-gamma",
+        "type": "ACTION",
+        "payload": {
+            "thought": "Destination reached.",
+            "intent": "Stop",
+            "position": [
+                10.5,
+                0.4,
+                1.0
+            ],
+            "confidence": 0.97
+        }
+    },
+    {
+        "tick": 9,
+        "agent_id": "car-alpha",
+        "type": "ACTION",
+        "payload": {
+            "thought": "New step added.",
+            "intent": "Stop",
+            "position": [
+                1.0,
+                0.4,
+                4.0
+            ],
+            "confidence": 0.97
+        }
+    },
+    {
+        "tick": 9,
+        "agent_id": "car-beta",
+        "type": "ACTION",
+        "payload": {
+            "thought": "New step added.",
+            "intent": "Stop",
+            "position": [
+                -1.0,
+                0.4,
+                4.0
+            ],
+            "confidence": 0.97
+        }
+    },
+    {
+        "tick": 9,
+        "agent_id": "car-delta",
+        "type": "ACTION",
+        "payload": {
+            "thought": "New step added.",
+            "intent": "Stop",
+            "position": [
+                -5.5,
+                0.4,
+                -1.0
+            ],
+            "confidence": 0.97
+        }
+    },
+    {
+        "tick": 9,
+        "agent_id": "car-gamma",
+        "type": "ACTION",
+        "payload": {
+            "thought": "New step added.",
+            "intent": "Stop",
+            "position": [
+                14.5,
+                0.4,
+                1.0
+            ],
+            "confidence": 0.97
+        }
+    },
+    {
+        "tick": 10,
+        "agent_id": "car-alpha",
+        "type": "ACTION",
+        "payload": {
+            "thought": "New step added.",
+            "intent": "Stop",
+            "position": [
+                1.0,
+                0.4,
+                2.5
+            ],
+            "confidence": 0.97
+        }
+    },
+    {
+        "tick": 10,
+        "agent_id": "car-beta",
+        "type": "ACTION",
+        "payload": {
+            "thought": "New step added.",
+            "intent": "Stop",
+            "position": [
+                -1.0,
+                0.4,
+                6.0
+            ],
+            "confidence": 0.97
+        }
+    },
+    {
+        "tick": 10,
+        "agent_id": "car-delta",
+        "type": "ACTION",
+        "payload": {
+            "thought": "New step added.",
+            "intent": "Stop",
+            "position": [
+                -8.0,
+                0.4,
+                -1.0
+            ],
+            "confidence": 0.97
+        }
+    },
+    {
+        "tick": 11,
+        "agent_id": "car-alpha",
+        "type": "ACTION",
+        "payload": {
+            "thought": "New step added.",
+            "intent": "Stop",
+            "position": [
+                1.5,
+                0.4,
+                1.5
+            ],
+            "confidence": 0.97
+        }
+    },
+    {
+        "tick": 11,
+        "agent_id": "car-beta",
+        "type": "ACTION",
+        "payload": {
+            "thought": "New step added.",
+            "intent": "Stop",
+            "position": [
+                -1.0,
+                0.4,
+                8.0
+            ],
+            "confidence": 0.97
+        }
+    },
+    {
+        "tick": 11,
+        "agent_id": "car-delta",
+        "type": "ACTION",
+        "payload": {
+            "thought": "New step added.",
+            "intent": "Stop",
+            "position": [
+                -10.0,
+                0.4,
+                -1.0
+            ],
+            "confidence": 0.97
+        }
+    },
+    {
+        "tick": 12,
+        "agent_id": "car-alpha",
+        "type": "ACTION",
+        "payload": {
+            "thought": "New step added.",
+            "intent": "Stop",
+            "position": [
+                2.5,
+                0.4,
+                1.0
+            ],
+            "confidence": 0.97
+        }
+    },
+    {
+        "tick": 12,
+        "agent_id": "car-beta",
+        "type": "ACTION",
+        "payload": {
+            "thought": "New step added.",
+            "intent": "Stop",
+            "position": [
+                -1.0,
+                0.4,
+                10.0
+            ],
+            "confidence": 0.97
+        }
+    },
+    {
+        "tick": 12,
+        "agent_id": "car-delta",
+        "type": "ACTION",
+        "payload": {
+            "thought": "New step added.",
+            "intent": "Stop",
+            "position": [
+                -12.0,
+                0.4,
+                -1.0
+            ],
+            "confidence": 0.97
+        }
+    },
+    {
+        "tick": 13,
+        "agent_id": "car-alpha",
+        "type": "ACTION",
+        "payload": {
+            "thought": "New step added.",
+            "intent": "Stop",
+            "position": [
+                5.0,
+                0.4,
+                1.0
+            ],
+            "confidence": 0.97
+        }
+    },
+    {
+        "tick": 13,
+        "agent_id": "car-beta",
+        "type": "ACTION",
+        "payload": {
+            "thought": "New step added.",
+            "intent": "Stop",
+            "position": [
+                -1.0,
+                0.4,
+                12.0
+            ],
+            "confidence": 0.97
+        }
+    },
+    {
+        "tick": 14,
+        "agent_id": "car-alpha",
+        "type": "ACTION",
+        "payload": {
+            "thought": "New step added.",
+            "intent": "Stop",
+            "position": [
+                7.5,
+                0.4,
+                1.0
+            ],
+            "confidence": 0.97
+        }
+    },
+    {
+        "tick": 15,
+        "agent_id": "car-alpha",
+        "type": "ACTION",
+        "payload": {
+            "thought": "New step added.",
+            "intent": "Stop",
+            "position": [
+                10.0,
+                0.4,
+                1.0
+            ],
+            "confidence": 0.97
+        }
+    },
+    {
+        "tick": 16,
+        "agent_id": "car-alpha",
+        "type": "ACTION",
+        "payload": {
+            "thought": "New step added.",
+            "intent": "Stop",
+            "position": [
+                12.5,
+                0.4,
+                1.0
+            ],
+            "confidence": 0.97
+        }
+    }
+]
