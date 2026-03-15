@@ -5,6 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:host": "vite --host",
+    "vr:usb": "adb wait-for-device && adb reverse tcp:5173 tcp:5173 && vite --host",
+    "vr:usb:check": "adb devices -l && adb reverse --list",
+    "vr:usb:clear": "adb reverse --remove tcp:5173 || true",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
